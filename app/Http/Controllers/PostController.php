@@ -19,14 +19,7 @@ class PostController extends Controller
     return view('posts.create', compact('categories')); // Передаем категории в представление
 }
 
-    public function index()
-    {
-        $user = Auth::user();
-        $categories = $user->categories->pluck('id');
-        $posts = Post::whereIn('category_id', $categories)->orderBy('created_at', 'desc')->get();
-
-        return view('posts.index', compact('posts'));
-    }
+    
 
     public function store(Request $request)
     {
@@ -52,7 +45,7 @@ class PostController extends Controller
         $post->video = $request->video;
         $post->save();
 
-        return redirect()->route('posts.index')->with('success', 'Пост успешно создан.');
+        return redirect()->route('profile')->with('success', 'Пост успешно создан.');
     }
 
     public function edit(Post $post)

@@ -86,10 +86,10 @@ class AuthController extends Controller
     }
 
     public function logout()
-    {
-        Auth::logout();
+{
+    Auth::logout();
+    return redirect('/')->with('success', 'Вы вышли из аккаунта!');
+}
 
-        return response()->json(['message' => 'Вы вышли из аккаунта!']);
-    }
 
 }

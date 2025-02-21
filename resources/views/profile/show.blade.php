@@ -10,7 +10,16 @@
         @else
             <p>Аватар не установлен.</p>
         @endif
-        <a href="{{ route('profile.edit') }}" class="text-blue-600">Редактировать профиль</a>
+        <a href="{{ route('profile.edit') }}" class="text-blue-600">Редактировать профиль</a><br><br>
+        <a href="{{ route('posts.create') }}" class="bg-blue-600 text-white p-2 rounded mb-4 inline-block">Создать пост</a>
+
+        <form action="{{ route('profile.destroy') }}" method="POST" class="mt-4">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="bg-red-500 text-white p-2 rounded"
+                onclick="return confirm('Вы уверены, что хотите удалить свой аккаунт? Это действие необратимо.')">Удалить аккаунт</button>
+        </form>
+
     </div>
     {{-- ///////////////////////////////////////////////////Публикации --}}
     <h1 class="text-2xl font-bold mb-4">Мои посты</h1>

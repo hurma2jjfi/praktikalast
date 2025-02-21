@@ -6,6 +6,7 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\FriendController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\NewsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -34,11 +35,13 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware('auth')->group(function () {
     Route::get('/', [ProfileController::class, 'show'])->name('profile');
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    
     // Route::get('/profile/show', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/update-password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
     Route::delete('/profile/delete', [ProfileController::class, 'delete'])->name('profile.delete');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Category Routes (Admin)
     Route::middleware('admin')->group(function () {
@@ -48,10 +51,13 @@ Route::middleware('auth')->group(function () {
         Route::delete('/admin/categories/{category}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
     });
 
+
+    Route::get('/news', [NewsController::class, 'index'])->name('news.index');
+
+    
     // Post Routes
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
     Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
-    Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
     Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
     
     //Удаление и редактирование поста
