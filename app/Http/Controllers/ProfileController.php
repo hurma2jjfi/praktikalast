@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Friend;
+use App\Models\User;
 
 class ProfileController extends Controller
 {
@@ -16,11 +18,29 @@ class ProfileController extends Controller
 
     public function show()
 {
-    $user = Auth::user(); 
+    $user = Auth::user();
+     
     ////Посты снизу 
     $posts = Post::where('user_id', $user->id)->orderBy('created_at', 'desc')->get();
 
-    return view('profile.show', compact('user', 'posts')); 
+    $friendCount = $this->getCountFriends();
+
+    return view('profile.show', compact('user', 'posts', 'friendCount')); 
+}
+
+public function getCountFriends()
+{
+    $user = Auth::user();
+
+    // Получаем количество друзей
+    $friendCount = Friend::where(function ($query) use ($user) {
+        $query->where('user_id', $user->id)
+              ->orWhere('friend_id', $user->id);
+    })
+    ->where('status', 'Принято') // Только принятые заявки
+    ->count();
+
+    return $friendCount; // Возвращаем только число
 }
 
 
@@ -132,4 +152,22 @@ class ProfileController extends Controller
         return redirect()->route('login')->with('success', 'Ваш аккаунт был успешно удален.');
     }
 
+
+    public function showAnother(User $user)
+{
+    // Получаем количество друзей
+    $friendCount = Friend::where(function ($query) use ($user) {
+        $query->where('user_id', $user->id)
+              ->orWhere('friend_id', $user->id);
+    })
+    ->where('status', 'Принято') // Только принятые заявки
+    ->count();
+
+    
+
+    // Получаем посты пользователя
+    $posts = $user->posts()->latest()->get();
+
+    return view('profile.another', compact('user', 'friendCount', 'posts'));
+}
 }

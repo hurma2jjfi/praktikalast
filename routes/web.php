@@ -7,6 +7,7 @@ use App\Http\Controllers\FriendController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\NewsController;
+use App\Http\Controllers\CommentController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -35,9 +36,9 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware('auth')->group(function () {
     Route::get('/', [ProfileController::class, 'show'])->name('profile');
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
-    
-    // Route::get('/profile/show', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/profile/{user}', [ProfileController::class, 'showAnother'])->name('profile.another');
+    // Route::get('/profile/show', [ProfileController::class, 'show'])->name('profile.show');
     Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/update-password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
     Route::delete('/profile/delete', [ProfileController::class, 'delete'])->name('profile.delete');
@@ -65,6 +66,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
     Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
+
+
+    Route::post('/news/{news}/comments', [CommentController::class, 'store'])->name('comments.store');
 
     // Friend Routes
     Route::get('/friends/search', [FriendController::class, 'search'])->name('friends.search');

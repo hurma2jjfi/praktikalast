@@ -25,35 +25,37 @@
     <h2 class="text-xl font-bold mb-2">Список друзей</h2>
     @if (count($friends) > 0)
         @foreach($friends as $friend)
-            <div class="bg-white p-4 rounded-lg shadow-md mb-4 flex items-center justify-between">
-                <div class="flex items-center">
-                    <!-- Аватарка друга -->
-                    @if ($friend->userInfo && $friend->userInfo->avatar)
-                        <img src="{{ asset('storage/' . $friend->userInfo->avatar) }}" alt="Аватар" class="w-12 h-12 rounded-full mr-4">
-                    @else
-                        <img src="https://via.placeholder.com/50" alt="Нет аватара" class="w-12 h-12 rounded-full mr-4">
-                    @endif
-
-                    <!-- Информация о друге -->
-                    <div>
-                        <p>{{ $friend->userInfo->first_name }} {{ $friend->userInfo->last_name }}</p>
-                        <p>Статус: Принято</p>
-                        <!-- Время последней активности -->
-                        <div class="flex items-center">
-                            @if ($friend->isOnline())
-                                <span class="w-2 h-2 bg-green-500 rounded-full inline-block"></span> <!-- Зеленый кружок -->
-                                <span class="text-sm text-gray-500 ml-1">Онлайн</span>
-                            @else
-                                <span class="w-2 h-2 bg-gray-400 rounded-full inline-block"></span> <!-- Серый кружок -->
-                                <span class="text-sm text-gray-500 ml-1">{{ $friend->lastSeen() }}</span>
-                            @endif
-                        </div>
+        <div class="bg-white p-4 rounded-lg shadow-md mb-4 flex items-center justify-between">
+            <div class="flex items-center">
+                <!-- Аватарка друга -->
+                @if ($friend->userInfo && $friend->userInfo->avatar)
+                    <img src="{{ asset('storage/' . $friend->userInfo->avatar) }}" alt="Аватар" class="w-12 h-12 rounded-full mr-4">
+                @else
+                    <img src="https://via.placeholder.com/50" alt="Нет аватара" class="w-12 h-12 rounded-full mr-4">
+                @endif
+        
+                <!-- Информация о друге -->
+                <div>
+                    <a href="{{ route('profile.another', $friend) }}" class="hover:underline">
+                        {{ $friend->userInfo->first_name }} {{ $friend->userInfo->last_name }}
+                    </a>
+                    <p>Статус: Принято</p>
+                    <!-- Время последней активности -->
+                    <div class="flex items-center">
+                        @if ($friend->isOnline())
+                            <span class="w-2 h-2 bg-green-500 rounded-full inline-block"></span> <!-- Зеленый кружок -->
+                            <span class="text-sm text-gray-500 ml-1">Онлайн</span>
+                        @else
+                            <span class="w-2 h-2 bg-gray-400 rounded-full inline-block"></span> <!-- Серый кружок -->
+                            <span class="text-sm text-gray-500 ml-1">{{ $friend->lastSeen() }}</span>
+                        @endif
                     </div>
                 </div>
-                <div>
-                    <a href="{{ route('friends.chat', $friend) }}" class="bg-blue-600 text-white p-2 rounded">Написать сообщение</a>
-                </div>
             </div>
+            <div>
+                <a href="{{ route('friends.chat', $friend) }}" class="bg-blue-600 text-white p-2 rounded">Написать сообщение</a>
+            </div>
+        </div>
         @endforeach
     @else
         <p>У вас пока нет друзей.</p>

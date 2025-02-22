@@ -42,9 +42,18 @@
         <div class="mb-4">
             <label for="avatar" class="block text-gray-700">Аватар</label>
             @if (auth()->user()->userInfo && auth()->user()->userInfo->avatar)
-                <img src="{{ asset('storage/' . auth()->user()->userInfo->avatar) }}" alt="Аватар" class="w-32 h-32 rounded-full mb-2">
+                <img src="{{ asset('storage/' . auth()->user()->userInfo->avatar) }}" alt="Аватар" class="w-32 h-32 rounded-full mb-2" id="avatar-preview">
+            @else
+                <img src="https://via.placeholder.com/128" alt="Аватар" class="w-32 h-32 rounded-full mb-2" id="avatar-preview">
             @endif
-            <input type="file" name="avatar" id="avatar" class="@error('avatar') border-red-500 @enderror">
+
+            <!-- Кнопка выбора файла -->
+            <div class="relative w-32 h-10">
+                <input type="file" name="avatar" id="avatar" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer">
+                <label for="avatar" class="w-full h-full flex items-center justify-center bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-lg shadow-md hover:from-pink-600 hover:to-purple-600 transition-all duration-300">
+                    Выбрать файл
+                </label>
+            </div>
             @error('avatar')
                 <p class="text-red-500 text-xs italic">{{ $message }}</p>
             @enderror
@@ -87,4 +96,17 @@
     @endif
 
 </div>
+
+<script>
+    document.getElementById('avatar').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('avatar-preview').src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
 @endsection
