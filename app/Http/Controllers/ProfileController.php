@@ -33,14 +33,12 @@ class ProfileController extends Controller
 
     public function update(Request $request)
 {
-    $user = Auth::user();
-
-    // Валидация данных
+    // Валидация данных профиля
     $validator = Validator::make($request->all(), [
         'first_name' => 'required|regex:/^[а-яА-ЯёЁ\s-]+$/u',
         'last_name' => 'required|regex:/^[а-яА-ЯёЁ\s-]+$/u',
-        'login' => 'required|unique:users,login,' . $user->id . '|regex:/^[a-zA-Zа-яА-ЯёЁ0-9_-]+$/u',
-        'email' => 'required|email|unique:users,email,' . $user->id, // Добавлена валидация email
+        'login' => 'required|unique:users,login,' . Auth::id() . '|regex:/^[a-zA-Zа-яА-ЯёЁ0-9_-]+$/u',
+        'email' => 'required|email|unique:users,email,' . Auth::id(),
         'avatar' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
     ]);
 
@@ -48,45 +46,48 @@ class ProfileController extends Controller
         return back()->withErrors($validator)->withInput();
     }
 
-    // Обновление логина и email пользователя
+    // Обновление данных пользователя
+    $user = Auth::user();
     $user->login = $request->login;
-    $user->email = $request->email; // Добавлено обновление email
+    $user->email = $request->email;
 
-    // Попробуем сохранить изменения
-    try {
-        $user->save();
-    } catch (\Exception $e) {
-        return back()->withErrors(['error' => 'Ошибка при обновлении данных пользователя: ' . $e->getMessage()])->withInput();
+    // Проверка на старый пароль и обновление его, если введен новый пароль
+    if ($request->filled('old_password')) {
+        if (!Hash::check($request->old_password, $user->password)) {
+            return back()->withErrors(['old_password' => 'Неверный старый пароль.']);
+        }
+
+        // Валидация нового пароля
+        $request->validate([
+            'password' => 'required|confirmed|min:8', // Минимальная длина пароля 8 символов
+        ]);
+
+        // Обновление пароля пользователя
+        $user->password = Hash::make($request->password);
     }
 
-    // Поиск или создание UserInfo
+    // Сохранение изменений пользователя
+    $user->save();
+
+    // Обновление информации о пользователе (если необходимо)
     $userInfo = UserInfo::firstOrNew(['user_id' => $user->id]);
     $userInfo->first_name = $request->first_name;
     $userInfo->last_name = $request->last_name;
 
     // Обновление аватара, если он загружен
     if ($request->hasFile('avatar')) {
-        $avatar = $request->file('avatar');
-        $filename = time() . '.' . $avatar->getClientOriginalExtension();
-    
-        // Сохранение файла в storage/app/public/avatars
-        $path = $avatar->storeAs('public/avatars', $filename);
-
-        // Сохранение пути в базе данных в формате avatars/путь
-        $userInfo->avatar = 'avatars/' . $filename; 
-    }
-    
-
-    // Попробуем сохранить UserInfo
-    try {
-        $userInfo->save();
-    } catch (\Exception $e) {
-        return back()->withErrors(['error' => 'Ошибка при обновлении информации о пользователе: ' . $e->getMessage()])->withInput();
+        if ($request->file('avatar')->isValid()) {
+            $path = $request->file('avatar')->store('public/avatars');
+            $userInfo->avatar = str_replace('public/', '', $path); 
+        }
     }
 
-    // Редирект на страницу редактирования профиля с сообщением об успехе
+    // Сохранение информации о пользователе
+    $userInfo->save();
+
     return redirect()->route('profile.edit')->with('success', 'Профиль успешно обновлён.');
 }
+
 
 
 

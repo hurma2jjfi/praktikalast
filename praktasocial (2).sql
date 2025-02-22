@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Фев 21 2025 г., 16:44
+-- Время создания: Фев 21 2025 г., 21:23
 -- Версия сервера: 8.0.30
 -- Версия PHP: 8.1.9
 
@@ -33,6 +33,18 @@ CREATE TABLE `categories` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Дамп данных таблицы `categories`
+--
+
+INSERT INTO `categories` (`id`, `name`, `created_at`, `updated_at`) VALUES
+(1, 'Технологии', '2025-02-21 14:01:49', '2025-02-21 14:01:49'),
+(2, 'Спорт', '2025-02-21 14:01:49', '2025-02-21 14:01:49'),
+(3, 'Здоровье', '2025-02-21 14:01:49', '2025-02-21 14:01:49'),
+(4, 'Наука', '2025-02-21 14:01:49', '2025-02-21 14:01:49'),
+(5, 'Искусство', '2025-02-21 14:01:49', '2025-02-21 14:01:49'),
+(6, 'Музыка', '2025-02-21 14:01:49', '2025-02-21 14:01:49');
 
 -- --------------------------------------------------------
 
@@ -117,7 +129,8 @@ CREATE TABLE `friends` (
 --
 
 INSERT INTO `friends` (`id`, `user_id`, `friend_id`, `status`, `created_at`, `updated_at`) VALUES
-(5, 2, 1, 'Принято', '2025-02-21 09:01:28', '2025-02-21 09:02:50');
+(5, 2, 1, 'Принято', '2025-02-21 09:01:28', '2025-02-21 09:02:50'),
+(7, 1, 2, 'В ожидании', '2025-02-21 10:45:30', '2025-02-21 10:45:30');
 
 -- --------------------------------------------------------
 
@@ -226,6 +239,13 @@ CREATE TABLE `posts` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Дамп данных таблицы `posts`
+--
+
+INSERT INTO `posts` (`id`, `user_id`, `category_id`, `content`, `image`, `video`, `created_at`, `updated_at`) VALUES
+(4, 1, 6, 'Люблю музыку!', 'uploads/posts/1740160668.jpeg', NULL, '2025-02-21 14:57:48', '2025-02-21 14:57:48');
+
 -- --------------------------------------------------------
 
 --
@@ -249,7 +269,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `login`, `email`, `email_verified_at`, `password`, `is_admin`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 'utipov36', 'utipov36@gmail.com', NULL, '$2y$10$I3zBJbYW5axkJtNlB6jIeOezYJbeIHn9PjdmEGuz.d3s9BFAJBpEi', 0, NULL, '2025-02-21 07:11:13', '2025-02-21 07:11:13'),
+(1, 'utipov36', 'utipov36@gmail.com', NULL, '$2y$10$I3zBJbYW5axkJtNlB6jIeOezYJbeIHn9PjdmEGuz.d3s9BFAJBpEi', 0, NULL, '2025-02-21 07:11:13', '2025-02-21 14:46:17'),
 (2, 'alex', 'alex@mail.ru', NULL, '$2y$10$76cngTzGdxb/kM3Yq2yAxesk63nVWDo3qIc2jHU1WoYpivWjdvFLu', 0, NULL, '2025-02-21 08:45:29', '2025-02-21 08:45:29');
 
 -- --------------------------------------------------------
@@ -273,7 +293,7 @@ CREATE TABLE `user_infos` (
 --
 
 INSERT INTO `user_infos` (`id`, `user_id`, `first_name`, `last_name`, `avatar`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Сергей', 'Утипов', 'avatars/HNiVLE1RXJsQ42ImkX96feFSz1Ot9aDDIzx7QDTX.png', '2025-02-21 07:11:13', '2025-02-21 07:11:13'),
+(1, 1, 'Кирюха', 'Афанасьев', 'avatars/1740159944.png', '2025-02-21 07:11:13', '2025-02-21 14:45:45'),
 (2, 2, 'Александр', 'Нинаю', 'avatars/sfA1Y33hTw0WprJuk7znZLRhr0DuYSejBXIkZ3TQ.png', '2025-02-21 08:45:29', '2025-02-21 08:45:29');
 
 --
@@ -383,7 +403,7 @@ ALTER TABLE `user_infos`
 -- AUTO_INCREMENT для таблицы `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT для таблицы `chats`
@@ -407,7 +427,7 @@ ALTER TABLE `failed_jobs`
 -- AUTO_INCREMENT для таблицы `friends`
 --
 ALTER TABLE `friends`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT для таблицы `messages`
@@ -431,19 +451,19 @@ ALTER TABLE `personal_access_tokens`
 -- AUTO_INCREMENT для таблицы `posts`
 --
 ALTER TABLE `posts`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT для таблицы `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT для таблицы `user_infos`
 --
 ALTER TABLE `user_infos`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц

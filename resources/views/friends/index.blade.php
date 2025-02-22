@@ -36,8 +36,18 @@
 
                     <!-- Информация о друге -->
                     <div>
-                        <p>{{ $friend->login }}</p>
+                        <p>{{ $friend->userInfo->first_name }} {{ $friend->userInfo->last_name }}</p>
                         <p>Статус: Принято</p>
+                        <!-- Время последней активности -->
+                        <div class="flex items-center">
+                            @if ($friend->isOnline())
+                                <span class="w-2 h-2 bg-green-500 rounded-full inline-block"></span> <!-- Зеленый кружок -->
+                                <span class="text-sm text-gray-500 ml-1">Онлайн</span>
+                            @else
+                                <span class="w-2 h-2 bg-gray-400 rounded-full inline-block"></span> <!-- Серый кружок -->
+                                <span class="text-sm text-gray-500 ml-1">{{ $friend->lastSeen() }}</span>
+                            @endif
+                        </div>
                     </div>
                 </div>
                 <div>

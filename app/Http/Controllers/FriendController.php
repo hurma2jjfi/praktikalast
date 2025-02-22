@@ -144,8 +144,25 @@ public function add(Request $request, User $user)
     // Получаем сообщения из этого чата
     $messages = $chat ? $chat->messages()->get() : collect();
 
-    return view('friends.chat', compact('messages', 'user'));
+    // Обновляем поле read_at для всех сообщений, если они были отправлены другим пользователем
+    if ($messages->isNotEmpty()) {
+        foreach ($messages as $message) {
+            if ($message->user_id !== Auth::id() && is_null($message->read_at)) {
+                $message->read_at = now(); // Устанавливаем время прочтения
+                $message->save(); // Сохраняем изменения
+            }
+        }
+    }
+
+    // Получаем информацию о пользователе (имя и фамилию)
+    $firstName = $user->userInfo->first_name ?? '';
+    $lastName = $user->userInfo->last_name ?? '';
+
+    return view('friends.chat', compact('messages', 'user', 'firstName', 'lastName'));
 }
+
+
+
 
 public function sendMessage(Request $request, User $user)
 {

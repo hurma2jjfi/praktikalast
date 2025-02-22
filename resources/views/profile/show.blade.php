@@ -1,15 +1,35 @@
 @extends('layouts.app')
+
 @section('content')
     <h1 class="text-2xl font-bold mb-4">Профиль</h1>
     <div class="bg-white p-4 rounded-lg shadow-md mb-4">
-        <p><strong>Логин:</strong> {{ auth()->user()->login }}</p>
-        <p><strong>Email:</strong> {{ auth()->user()->email }}</p>
-        @if (auth()->user()->userInfo && auth()->user()->userInfo->avatar)
-            <img src="{{ asset('storage/' . auth()->user()->userInfo->avatar) }}" alt="Аватар"
-                class="w-32 h-32 rounded-full mb-2">
-        @else
-            <p>Аватар не установлен.</p>
-        @endif
+        <div class="flex items-center mb-4">
+            <!-- Аватарка пользователя -->
+            @if (auth()->user()->userInfo && auth()->user()->userInfo->avatar)
+                <img src="{{ asset('storage/' . auth()->user()->userInfo->avatar) }}" alt="Аватар" class="w-32 h-32 rounded-full mr-4">
+            @else
+                <p>Аватар не установлен.</p>
+            @endif
+
+            <!-- Информация о пользователе и статус активности -->
+            <div>
+                <p><strong>Имя:</strong> {{ auth()->user()->userInfo->first_name }}</p>
+                <p><strong>Фамилия:</strong> {{ auth()->user()->userInfo->last_name }}</p>
+                <p><strong>Логин:</strong> {{ auth()->user()->login }}</p>
+                <p><strong>Email:</strong> {{ auth()->user()->email }}</p>
+                <!-- Статус активности -->
+                <div class="flex items-center">
+                    @if (auth()->user()->isOnline())
+                        <span class="w-2 h-2 bg-green-500 rounded-full inline-block"></span> <!-- Зеленый кружок -->
+                        <span class="text-sm text-gray-500 ml-1">Онлайн</span>
+                    @else
+                        <span class="w-2 h-2 bg-gray-400 rounded-full inline-block"></span> <!-- Серый кружок -->
+                        <span class="text-sm text-gray-500 ml-1">{{ auth()->user()->lastSeen() }}</span>
+                    @endif
+                </div>
+            </div>
+        </div>
+
         <a href="{{ route('profile.edit') }}" class="text-blue-600">Редактировать профиль</a><br><br>
         <a href="{{ route('posts.create') }}" class="bg-blue-600 text-white p-2 rounded mb-4 inline-block">Создать пост</a>
 
@@ -19,8 +39,8 @@
             <button type="submit" class="bg-red-500 text-white p-2 rounded"
                 onclick="return confirm('Вы уверены, что хотите удалить свой аккаунт? Это действие необратимо.')">Удалить аккаунт</button>
         </form>
-
     </div>
+
     {{-- ///////////////////////////////////////////////////Публикации --}}
     <h1 class="text-2xl font-bold mb-4">Мои посты</h1>
     <div class="bg-white p-4 rounded-lg shadow-md mb-4">

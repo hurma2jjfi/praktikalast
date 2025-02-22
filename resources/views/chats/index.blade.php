@@ -20,8 +20,19 @@
                     <img src="https://via.placeholder.com/50" alt="Нет аватара" class="w-12 h-12 rounded-full mr-4">
                 @endif
 
-                <!-- Ссылка на чат -->
-                <a href="{{ route('friends.chat', $otherUser) }}" class="text-blue-600">Диалог с {{ $otherUser->login }}</a>
+                <!-- Информация о собеседнике и статус активности -->
+                <div class="flex-1">
+                    <a href="{{ route('friends.chat', $otherUser) }}" class="text-blue-600">Диалог с {{ $otherUser->login }}</a>
+                    <div class="flex items-center">
+                        @if ($otherUser->isOnline())
+                            <span class="w-2 h-2 bg-green-500 rounded-full inline-block"></span> <!-- Зеленый кружок -->
+                            <span class="text-sm text-gray-500 ml-1">Онлайн</span>
+                        @else
+                            <span class="w-2 h-2 bg-gray-400 rounded-full inline-block"></span> <!-- Серый кружок -->
+                            <span class="text-sm text-gray-500 ml-1">{{ $otherUser->lastSeen() }}</span>
+                        @endif
+                    </div>
+                </div>
             </div>
         @endforeach
     @endif
