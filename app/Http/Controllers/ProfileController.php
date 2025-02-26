@@ -19,13 +19,31 @@ class ProfileController extends Controller
     public function show()
 {
     $user = Auth::user();
-     
-    ////Посты снизу 
-    $posts = Post::where('user_id', $user->id)->orderBy('created_at', 'desc')->get();
 
+    // Получаем все посты пользователя
+    $posts = $user->posts()->with('comments.user.userInfo')->orderBy('created_at', 'desc')->get();
+
+    // Собираем все комментарии из постов
+    $comments = collect();
+    foreach ($posts as $post) {
+        $comments = $comments->merge($post->comments);
+    }
+
+    // Получаем количество друзей
     $friendCount = $this->getCountFriends();
 
-    return view('profile.show', compact('user', 'posts', 'friendCount')); 
+    // Получаем список друзей с их аватарками
+    $friends = Friend::where(function ($query) use ($user) {
+        $query->where('user_id', $user->id)
+              ->orWhere('friend_id', $user->id);
+    })
+    ->where('status', 'Принято') // Только принятые заявки
+    ->get()
+    ->map(function ($friend) use ($user) {
+        return $friend->user_id === $user->id ? $friend->friend : $friend->user;
+    });
+
+    return view('profile.show', compact('user', 'posts', 'friendCount', 'comments', 'friends'));
 }
 
 public function getCountFriends()
@@ -163,11 +181,20 @@ public function getCountFriends()
     ->where('status', 'Принято') // Только принятые заявки
     ->count();
 
-    
+    // Получаем список друзей с их аватарками
+    $friends = Friend::where(function ($query) use ($user) {
+        $query->where('user_id', $user->id)
+              ->orWhere('friend_id', $user->id);
+    })
+    ->where('status', 'Принято') // Только принятые заявки
+    ->get()
+    ->map(function ($friend) use ($user) {
+        return $friend->user_id === $user->id ? $friend->friend : $friend->user;
+    });
 
     // Получаем посты пользователя
     $posts = $user->posts()->latest()->get();
 
-    return view('profile.another', compact('user', 'friendCount', 'posts'));
+    return view('profile.another', compact('user', 'friendCount', 'posts', 'friends'));
 }
 }

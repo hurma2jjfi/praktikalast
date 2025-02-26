@@ -38,6 +38,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::get('/profile/{user}', [ProfileController::class, 'showAnother'])->name('profile.another');
+    Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
     // Route::get('/profile/show', [ProfileController::class, 'show'])->name('profile.show');
     Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/update-password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
@@ -68,7 +69,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
 
 
-    Route::post('/news/{news}/comments', [CommentController::class, 'store'])->name('comments.store');
 
     // Friend Routes
     Route::get('/friends/search', [FriendController::class, 'search'])->name('friends.search');
@@ -80,6 +80,8 @@ Route::middleware('auth')->group(function () {
     // Chat Routes
     Route::get('/friends/{user}/chat', [FriendController::class, 'showChat'])->name('friends.chat');
     Route::post('/friends/{user}/chat/send', [FriendController::class, 'sendMessage'])->name('friends.sendMessage');
+    Route::delete('/friends/messages/{message}', [FriendController::class, 'deleteMessage'])->name('friends.deleteMessage');
+
 
     Route::get('/chats', [ChatController::class, 'index'])->name('chats.index');
     Route::get('/chats/{chat}', [ChatController::class, 'show'])->name('chats.show');

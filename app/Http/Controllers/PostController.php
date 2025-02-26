@@ -21,32 +21,39 @@ class PostController extends Controller
 
     
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'content' => 'required',
-            'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'video' => 'nullable|url',
-        ]);
+public function store(Request $request)
+{
+    $request->validate([
+        'category_id' => 'required|exists:categories,id',
+        'content' => 'required',
+        'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        'video' => 'nullable|mimes:mp4,webm,ogg|max:512000', 
+    ]);
 
-        $post = new Post();
-        $post->user_id = Auth::id();
-        $post->category_id = $request->category_id;
-        $post->content = $request->content;
+    $post = new Post();
+    $post->user_id = Auth::id();
+    $post->category_id = $request->category_id;
+    $post->content = $request->content;
 
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $filename = time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('uploads/posts'), $filename);
-            $post->image = 'uploads/posts/' . $filename;
-        }
-
-        $post->video = $request->video;
-        $post->save();
-
-        return redirect()->route('profile')->with('success', 'Пост успешно создан.');
+    if ($request->hasFile('image')) {
+        $image = $request->file('image');
+        $filename = time() . '.' . $image->getClientOriginalExtension();
+        $image->move(public_path('uploads/posts'), $filename);
+        $post->image = 'uploads/posts/' . $filename;
     }
+
+    if ($request->hasFile('video')) {
+        $video = $request->file('video');
+        $filename = time() . '.' . $video->getClientOriginalExtension();
+        $video->move(public_path('uploads/posts/videos'), $filename);
+        $post->video = 'uploads/posts/videos/' . $filename;
+    }
+
+    $post->save();
+
+    return redirect()->route('profile')->with('success', 'Пост успешно создан.');
+}
+
 
     public function edit(Post $post)
     {

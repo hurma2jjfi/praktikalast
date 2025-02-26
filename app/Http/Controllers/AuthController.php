@@ -76,7 +76,7 @@ class AuthController extends Controller
         // Попытка авторизации пользователя
         if (Auth::attempt(['login' => $validated['login'], 'password' => $validated['password']])) {
             // Успешная авторизация, перенаправление на профиль
-            return redirect()->route('profile');
+            return redirect()->route('news.index');
         }
 
         // Если авторизация не удалась, вернуть с ошибкой

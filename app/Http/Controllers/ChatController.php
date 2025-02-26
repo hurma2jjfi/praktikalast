@@ -13,12 +13,23 @@ class ChatController extends Controller
     public function index()
 {
     $user = Auth::user();
+
     // Получаем все чаты, в которых участвует текущий пользователь
     $chats = Chat::where('user1_id', $user->id)
                  ->orWhere('user2_id', $user->id)
-                 ->with(['user1', 'user2']) // Загружаем пользователей для каждого чата
+                 ->with(['user1', 'user2', 'messages' => function ($query) use ($user) {
+                     $query->whereNull('read_at')
+                           ->where('user_id', '!=', $user->id); // Сообщения от собеседника
+                 }])
                  ->get();
 
+    // Добавляем счетчик непрочитанных сообщений для каждого чата
+    $chats->each(function ($chat) use ($user) {
+        $chat->unread_count = $chat->messages->count();
+    });
+
+
+    
     return view('chats.index', compact('chats'));
 }
 
@@ -64,6 +75,12 @@ public function showChat(Chat $chat)
 
     // Определяем собеседника
     $otherUser = $chat->user1_id === Auth::id() ? $chat->user2 : $chat->user1;
+
+    // Помечаем сообщения как прочитанные
+    Message::where('chat_id', $chat->id)
+           ->where('user_id', $otherUser->id) // Сообщения от собеседника
+           ->whereNull('read_at') // Только непрочитанные
+           ->update(['read_at' => now()]);
 
     return view('chats.show', compact('chat', 'messages', 'otherUser'));
 }

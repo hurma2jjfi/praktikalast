@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1 class="text-2xl font-bold mb-4">Чат с {{ '@' . $user->login }} </h1>
+    <h1 class="text-2xl font-bold mb-4">Чат с {{ '@' . $user->login }}</h1>
 
     @if (session('success'))
         <div class="bg-green-500 text-white p-2 rounded mb-4">
@@ -10,19 +10,23 @@
     @endif
 
     <!-- Статус пользователя (отображается один раз вверху) -->
-    <div class="bg-white p-4 rounded-lg shadow-md mb-4">
+    <div class="bg-white p-4 rounded-lg border border-gray-200 mb-4">
         <div class="flex items-center mb-4">
-            <!-- Аватарка пользователя -->
-            @if ($user->userInfo && $user->userInfo->avatar)
-                <img src="{{ asset('storage/' . $user->userInfo->avatar) }}" alt="Аватар" class="w-8 h-8 rounded-full mr-2">
-            @else
-                <img src="https://via.placeholder.com/32" alt="Нет аватара" class="w-8 h-8 rounded-full mr-2">
-            @endif
+            <!-- Аватарка пользователя с градиентной границей -->
+            <div class="relative w-10 h-10 rounded-full mr-3 gradient-border">
+                @if ($user->userInfo && $user->userInfo->avatar)
+                    <img src="{{ asset('storage/' . $user->userInfo->avatar) }}" alt="Аватар" class="w-full h-full rounded-full object-cover">
+                @else
+                    <div class="w-full h-full rounded-full bg-gray-200 flex items-center justify-center">
+                        <p class="text-gray-500 text-xs">Аватар</p>
+                    </div>
+                @endif
+            </div>
 
             <!-- Имя пользователя, индикатор статуса и время последней активности -->
-            <div class="flex items-center">
+            <div>
                 <p class="font-bold">{{ $firstName }} {{ $lastName }}</p>
-                <span class="ml-2">
+                <div class="flex items-center">
                     @if ($user->isOnline())
                         <span class="w-2 h-2 bg-green-500 rounded-full inline-block"></span> <!-- Зеленый кружок -->
                         <span class="text-sm text-gray-500 ml-1">Онлайн</span>
@@ -30,53 +34,96 @@
                         <span class="w-2 h-2 bg-gray-400 rounded-full inline-block"></span> <!-- Серый кружок -->
                         <span class="text-sm text-gray-500 ml-1">{{ $user->lastSeen() }}</span>
                     @endif
-                </span>
+                </div>
             </div>
         </div>
 
         <!-- Список сообщений -->
-        @foreach($messages as $message)
-            <div class="flex items-start mb-2 {{ $message->user_id == Auth::id() ? 'flex-row-reverse text-right' : 'text-left' }}">
-                <!-- Аватарка пользователя -->
-                @if ($message->user->userInfo && $message->user->userInfo->avatar)
-                    <img src="{{ asset('storage/' . $message->user->userInfo->avatar) }}" alt="Аватар" class="w-8 h-8 rounded-full mr-2 ml-2">
-                @else
-                    <img src="https://via.placeholder.com/32" alt="Нет аватара" class="w-8 h-8 rounded-full mr-2 ml-2">
-                @endif
-
-                <!-- Сообщение и информация о пользователе -->
-                <div>
-                    <!-- Текст сообщения -->
-                    <p>{{ $message->content }}</p>
-
-                    <!-- Время отправки сообщения -->
-                    <small class="text-gray-500">{{ $message->created_at->diffForHumans() }}</small>
-
-                    <!-- Индикатор прочтения -->
-                    @if ($message->user_id == Auth::id())
-                        <div class="mt-1">
-                            @if ($message->read_at)
-                                <span class="text-sm text-gray-500">
-                                    <i class="fas fa-check text-green-500"></i> 
-                                    Прочитано: {{ $message->read_at->diffForHumans() }}
-                                </span>
+        <div class="space-y-4">
+            @foreach($messages as $message)
+                <div class="group flex items-start {{ $message->user_id == Auth::id() ? 'justify-end' : 'justify-start' }}">
+                    <!-- Аватарка пользователя -->
+                    @if ($message->user_id != Auth::id())
+                        <div class="relative w-8 h-8 rounded-full mr-3 gradient-border">
+                            @if ($message->user->userInfo && $message->user->userInfo->avatar)
+                                <img src="{{ asset('storage/' . $message->user->userInfo->avatar) }}" alt="Аватар" class="w-full h-full rounded-full object-cover">
                             @else
-                                <span class="text-sm text-gray-500">
-                                    <i class="fas fa-check text-gray-400"></i> 
-                                    Не прочитано
+                                <div class="w-full h-full rounded-full bg-gray-200 flex items-center justify-center">
+                                    <p class="text-gray-500 text-xs">Аватар</p>
+                                </div>
+                            @endif
+                        </div>
+                    @endif
+
+                    <!-- Сообщение и информация о пользователе -->
+                    <div class="max-w-[70%] relative">
+                        <!-- Текст сообщения -->
+                        <div class="p-3 rounded-lg {{ $message->user_id == Auth::id() ? 'bg-blue-100 text-right' : 'bg-gray-100 text-left' }}">
+                            <p>{{ $message->content }}</p>
+                        </div>
+
+                        <!-- Время отправки сообщения и индикатор прочтения -->
+                        <div class="mt-1 flex items-center {{ $message->user_id == Auth::id() ? 'justify-end' : 'justify-start' }}">
+                            <small class="text-xs text-gray-500">{{ $message->created_at->diffForHumans() }}</small>
+                            @if ($message->user_id == Auth::id())
+                                <span class="ml-2">
+                                    @if ($message->read_at)
+                                        <i class="fas fa-check text-green-500"></i>
+                                    @else
+                                        <i class="fas fa-check text-gray-400"></i>
+                                    @endif
                                 </span>
+                            @endif
+                        </div>
+
+                        <!-- Кнопка удаления (появляется при наведении) -->
+                        @if ($message->user_id == Auth::id())
+                            <form method="POST" action="{{ route('friends.deleteMessage', $message) }}" class="absolute -right-6 top-12 opacity-0 group-hover:opacity-100 transition-opacity">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-gray-500 hover:text-red-500">
+                                    <i class="fas fa-trash-alt"></i> <!-- Иконка корзины -->
+                                </button>
+                            </form>
+                        @endif
+                    </div>
+
+                    <!-- Аватарка текущего пользователя (если сообщение его) -->
+                    @if ($message->user_id == Auth::id())
+                        <div class="relative w-8 h-8 rounded-full ml-3 gradient-border">
+                            @if (Auth::user()->userInfo && Auth::user()->userInfo->avatar)
+                                <img src="{{ asset('storage/' . Auth::user()->userInfo->avatar) }}" alt="Аватар" class="w-full h-full rounded-full object-cover">
+                            @else
+                                <div class="w-full h-full rounded-full bg-gray-200 flex items-center justify-center">
+                                    <p class="text-gray-500 text-xs">Аватар</p>
+                                </div>
                             @endif
                         </div>
                     @endif
                 </div>
-            </div>
-        @endforeach
+            @endforeach
+        </div>
     </div>
 
     <!-- Форма отправки сообщения -->
-    <form method="POST" action="{{ route('friends.sendMessage', $user) }}">
+    <form method="POST" action="{{ route('friends.sendMessage', $user) }}" class="mt-4">
         @csrf
-        <input type="text" name="content" placeholder="Введите сообщение" class="w-full p-2 border rounded" required>
-        <button type="submit" class="bg-blue-600 text-white p-2 rounded mt-2">Отправить</button>
+        <div class="flex items-center gap-2">
+            <input type="text" name="content" placeholder="Введите сообщение" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" required>
+            <button type="submit" class="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700">Отправить</button>
+        </div>
     </form>
 @endsection
+
+<style>
+    .gradient-border {
+        padding: 2px; /* Толщина границы */
+        background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+        border-radius: 50%;
+    }
+
+    .gradient-border img {
+        border: 2px solid white; /* Внутренняя граница, чтобы отделить аватар от градиента */
+        border-radius: 50%;
+    }
+</style>

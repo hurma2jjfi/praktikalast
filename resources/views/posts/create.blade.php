@@ -14,6 +14,10 @@
                 <input type="file" name="image" id="image" class="w-full p-2 border rounded">
             </div>
             <div class="mb-4">
+                <label for="video" class="block text-gray-700">Видео</label>
+                <input type="file" name="video" id="video" class="w-full p-2 border rounded">
+            </div>
+            <div class="mb-4">
                 <label for="category_id" class="block text-gray-700">Категория</label>
                 <select name="category_id" id="category_id" class="w-full p-2 border rounded" required>
                     @foreach($categories as $category)

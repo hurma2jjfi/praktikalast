@@ -3,7 +3,7 @@
 @section('content')
     <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-2xl font-bold mb-4">Регистрация</h2>
-        <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data"> <!-- Добавлено enctype -->
+        <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
             @csrf
 
             <div class="mb-4">
@@ -56,6 +56,18 @@
                 <label for="avatar" class="block text-gray-700">Аватар</label>
                 <input type="file" name="avatar" id="avatar" accept=".jpg,.jpeg,.png,.gif" class="@error('avatar') border-red-500 @enderror">
                 @error('avatar')
+                    <p class="text-red-500 text-xs italic">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <!-- Согласие на обработку персональных данных -->
+            <div class="mb-4">
+                <label class="block text-gray-700">
+                    <input type="checkbox" name="personal_data_agreement" id="personal_data_agreement" required>
+                    Я даю согласие на обработку своих персональных данных в соответствии с <a href="#" class="underline" target="_blank">Политикой конфиденциальности</a>
+
+                </label>
+                @error('personal_data_agreement')
                     <p class="text-red-500 text-xs italic">{{ $message }}</p>
                 @enderror
             </div>

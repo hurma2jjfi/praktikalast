@@ -3,8 +3,11 @@
 @section('content')
     <h1 class="text-2xl font-bold mb-4">Поиск друзей</h1>
     <form method="GET" action="{{ route('friends.search') }}" class="mb-4">
-        <input type="text" name="search" placeholder="Введите логин" class="w-full p-2 border rounded" required>
-        <button type="submit" class="bg-blue-600 text-white p-2 rounded mt-2">Искать</button>
+        <div class="flex items-center gap-2">
+            <input type="text" name="search" placeholder="Введите имя пользователя" class="w-full p-2 border rounded" required>
+            <button type="submit" class="bg-blue-600 text-white p-2 rounded">Искать</button>
+        </div>
+        
     </form>
 
     @if($users->isEmpty())
@@ -21,7 +24,10 @@
 
                 <!-- Информация о пользователе и статус активности -->
                 <div>
-                    <p>{{ $user->login }}</p>
+                    <!-- Ссылка на профиль пользователя -->
+                    <a href="{{ route('profile.another', $user) }}" class="hover:underline">
+                        <p>{{ $user->login }}</p>
+                    </a>
                     <div class="flex items-center">
                         @if ($user->isOnline())
                             <span class="w-2 h-2 bg-green-500 rounded-full inline-block"></span> <!-- Зеленый кружок -->

@@ -15,7 +15,7 @@ class FriendController extends Controller
 {
     $user = Auth::user();
 
-    // Получаем список друзей, исключая текущего пользователя
+    // Получаем список друзей
     $friends = Friend::where('status', 'Принято')
         ->where(function($query) use ($user) {
             $query->where('user_id', $user->id)
@@ -23,7 +23,6 @@ class FriendController extends Controller
         })
         ->get()
         ->map(function($friend) use ($user) {
-            // Возвращаем объект с правильным другом
             return $friend->user_id === $user->id ? $friend->friend : $friend->user;
         });
 
@@ -32,7 +31,10 @@ class FriendController extends Controller
                              ->where('status', 'В ожидании')
                              ->get();
 
-    return view('friends.index', compact('friends', 'friendRequests'));
+    // Считаем количество непросмотренных запросов
+    $friendRequestsCount = $friendRequests->count();
+
+    return view('friends.index', compact('friends', 'friendRequests', 'friendRequestsCount'));
 }
 
 
@@ -195,9 +197,27 @@ public function sendMessage(Request $request, User $user)
         'content' => $request->content,
         'read_at' => null,
     ]);
+    
 
     return redirect()->route('friends.chat', $user)->with('success', 'Сообщение отправлено.');
 }
+
+public function deleteMessage(Request $request, Message $message)
+{
+    // Проверяем, является ли текущий пользователь отправителем сообщения
+    if ($message->user_id === Auth::id()) {
+        // Удаляем сообщение
+        $message->delete();
+        return redirect()->back()->with('success', 'Сообщение удалено.');
+    }
+
+    return redirect()->back()->with('error', 'Вы не можете удалить чужое сообщение.');
+}
+
+
+
+
+
 
 
 }

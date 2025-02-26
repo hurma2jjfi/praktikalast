@@ -50,7 +50,7 @@
             <!-- Кнопка выбора файла -->
             <div class="relative w-32 h-10">
                 <input type="file" name="avatar" id="avatar" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer">
-                <label for="avatar" class="w-full h-full flex items-center justify-center bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-lg shadow-md hover:from-pink-600 hover:to-purple-600 transition-all duration-300">
+                <label for="avatar" class="w-full h-full flex items-center justify-center border-2 border-dashed border-blue-400 text-gray-700 rounded-lg hover:border-purple-500 hover:text-purple-500 transition-all duration-300">
                     Выбрать файл
                 </label>
             </div>
