@@ -15,3 +15,4 @@
         <button type="submit" class="bg-blue-600 text-white p-2 rounded mt-2">Отправить</button>
     </form>
 @endsection
+

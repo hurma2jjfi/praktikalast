@@ -513,7 +513,7 @@ body.dark p {
 </head>
 <body class="bg-gray-100 dark:bg-gray-900">
     <!-- Кнопка бургер-меню -->
-    <button id="sidebar-toggle" class="fixed top-4 left-4 p-2 bg-black text-white rounded-lg leading-none z-50 lg:hidden">
+    <button id="sidebar-toggle" class="fixed top-4 left-6 p-2 bg-black text-white rounded-lg leading-none z-50 lg:hidden">
         <i class="fas fa-bars"></i>
     </button>
     
@@ -550,12 +550,20 @@ body.dark p {
                             <span>Друзья</span>
                         </a>
                     </li>
-                    <li class="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <li class="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 relative">
                         <a href="{{ route('chats.index') }}" class="block flex items-center">
                             <i class="fas fa-comments mr-2"></i>
                             <span>Сообщения</span>
                         </a>
+                        @auth
+                            @if ($totalUnreadCount > 0)
+                                <span class="absolute top-1 right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                                    {{ $totalUnreadCount }}
+                                </span>
+                            @endif
+                        @endauth
                     </li>
+                    
                     <li class="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">
                         <form action="{{ route('logout') }}" method="POST" class="inline">
                             @csrf
@@ -722,6 +730,7 @@ main {
         });
     </script>
 
-<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>     
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>   
 </body>
 </html>

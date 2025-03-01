@@ -9,14 +9,14 @@
         <button
             @click="activeTab = 'friends'"
             :class="{ 'border-b-2 border-black': activeTab === 'friends' }"
-            class="px-4 py-2 text-gray-700 hover:text-black focus:outline-none w-full sm:w-auto text-left sm:text-center"
+            class="px-4 py-2 text-gray-700 hover:text-blue-500 focus:outline-none w-full sm:w-auto text-left sm:text-center"
         >
             Друзья
         </button>
         <button
             @click="activeTab = 'requests'"
             :class="{ 'border-b-2 border-black': activeTab === 'requests' }"
-            class="px-4 py-2 text-gray-700 hover:text-black focus:outline-none w-full sm:w-auto text-left sm:text-center relative"
+            class="px-4 py-2 text-gray-700 hover:text-blue-500 focus:outline-none w-full sm:w-auto text-left sm:text-center relative"
         >
             Запросы в друзья
             @if ($friendRequestsCount > 0)
@@ -28,7 +28,7 @@
         <button
             @click="activeTab = 'search'"
             :class="{ 'border-b-2 border-black': activeTab === 'search' }"
-            class="px-4 py-2 text-gray-700 hover:text-black focus:outline-none w-full sm:w-auto text-left sm:text-center"
+            class="px-4 py-2 text-gray-700 hover:text-blue-500 focus:outline-none w-full sm:w-auto text-left sm:text-center"
         >
             Поиск друзей
         </button>
@@ -55,40 +55,58 @@
         @endif
 
         @if (count($friends) > 0)
-            @foreach($friends as $friend)
-                <div class="bg-white p-4 rounded-lg shadow-md mb-4 flex flex-col sm:flex-row items-center justify-between transform hover:scale-105 transition-transform duration-300">
-                    <div class="flex items-center mb-4 sm:mb-0">
-                        @if ($friend->userInfo && $friend->userInfo->avatar)
-                            <img src="{{ asset('storage/' . $friend->userInfo->avatar) }}" alt="Аватар" class="w-14 h-14 rounded-full mr-4">
-                        @else
-                            <img src="https://via.placeholder.com/50" alt="Нет аватара" class="w-12 h-12 rounded-full mr-4">
-                        @endif
-                        <div>
-                            <a href="{{ route('profile.another', $friend) }}" class="hover:underline font-medium">
-                                {{ $friend->userInfo->first_name }} {{ $friend->userInfo->last_name }}
-                            </a>
-                            <p class="text-sm text-gray-500">Статус: У вас в друзьях</p>
+            <div class="bg-white rounded-lg shadow-sm">
+                @foreach($friends as $friend)
+                    <div class="p-4 border-b border-gray-100 last:border-b-0">
+                        <div class="flex items-center justify-between">
                             <div class="flex items-center">
-                                @if ($friend->isOnline())
-                                    <span class="w-2 h-2 bg-green-500 rounded-full inline-block"></span>
-                                    <span class="text-sm text-gray-500 ml-1">Онлайн</span>
-                                @else
-                                    <span class="w-2 h-2 bg-gray-400 rounded-full inline-block"></span>
-                                    <span class="text-sm text-gray-500 ml-1">{{ $friend->lastSeen() }}</span>
-                                @endif
+                                <!-- Аватарка с индикатором онлайн-статуса -->
+                                <div class="relative w-10 h-10 rounded-full mr-3">
+                                    @if ($friend->userInfo && $friend->userInfo->avatar)
+                                        <img src="{{ asset('storage/' . $friend->userInfo->avatar) }}" alt="Аватар" class="w-full h-full rounded-full object-cover">
+                                    @else
+                                        <div class="w-full h-full rounded-full bg-gray-200 flex items-center justify-center">
+                                            <p class="text-gray-500 text-xs">Аватар</p>
+                                        </div>
+                                    @endif
+                                    <!-- Индикатор онлайн-статуса -->
+                                    @if ($friend->isOnline())
+                                        <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white"></span>
+                                    @endif
+                                </div>
+                                <div>
+                                    <a href="{{ route('profile.another', $friend) }}" class="hover:underline font-medium">
+                                        {{ $friend->userInfo->first_name }} {{ $friend->userInfo->last_name }}
+                                    </a>
+                                    <p class="text-sm text-gray-500">
+                                        @if ($friend->isOnline())
+                                            <span class="text-green-500">Онлайн</span>
+                                        @else
+                                            {{ $friend->lastSeen() }}
+                                        @endif
+                                    </p>
+                                </div>
                             </div>
+                            <div class="flex items-center gap-2">
+                                <!-- Кнопка "Написать сообщение" -->
+                                <div class="flex__btns">
+                                <a id="padding" href="{{ route('friends.chat', $friend) }}" class="button">
+                                    Написать
+                                </a>
+                                <!-- Кнопка "Удалить из друзья" -->
+                                <form method="POST" action="{{ route('friends.remove', $friend) }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="button button--remove">
+                                        Удалить
+                                    </button>
+                                </form></div>
+                            </div>
+                            
                         </div>
                     </div>
-                    <div class="flex flex-col sm:flex-row items-center gap-2">
-                        <form method="POST" action="{{ route('friends.remove', $friend) }}">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition-colors duration-300 w-full sm:w-auto">Удалить из друзей</button>
-                        </form>
-                        <a href="{{ route('friends.chat', $friend) }}" class="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition-colors duration-300 w-full sm:w-auto text-center">Написать сообщение</a>
-                    </div>
-                </div>
-            @endforeach
+                @endforeach
+            </div>
         @else
             <p class="text-gray-500">У вас пока нет друзей.</p>
         @endif
@@ -97,32 +115,51 @@
     <!-- Секция "Запросы в друзья" -->
     <div x-show="activeTab === 'requests'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
         @if(count($friendRequests) > 0)
-            @foreach($friendRequests as $request)
-                <div class="bg-white p-4 rounded-lg shadow-md mb-4 flex flex-col sm:flex-row items-center justify-between transform hover:scale-105 transition-transform duration-300">
-                    <div class="flex items-center mb-4 sm:mb-0">
-                        @if ($request->user->userInfo && $request->user->userInfo->avatar)
-                            <img src="{{ asset('storage/' . $request->user->userInfo->avatar) }}" alt="Аватар" class="w-12 h-12 rounded-full mr-4">
-                        @else
-                            <img src="https://via.placeholder.com/50" alt="Нет аватара" class="w-12 h-12 rounded-full mr-4">
-                        @endif
-                        <div>
-                            <p class="font-medium">{{ $request->user->login }}</p>
-                            <p class="text-sm text-gray-500">{{ $request->user->email }}</p>
+            <div class="bg-white rounded-lg shadow-sm">
+                @foreach($friendRequests as $request)
+                    <div class="p-4 border-b border-gray-100 last:border-b-0">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <!-- Аватарка с индикатором онлайн-статуса -->
+                                <div class="relative w-10 h-10 rounded-full mr-3">
+                                    @if ($request->user->userInfo && $request->user->userInfo->avatar)
+                                        <img src="{{ asset('storage/' . $request->user->userInfo->avatar) }}" alt="Аватар" class="w-full h-full rounded-full object-cover">
+                                    @else
+                                        <div class="w-full h-full rounded-full bg-gray-200 flex items-center justify-center">
+                                            <p class="text-gray-500 text-xs">Аватар</p>
+                                        </div>
+                                    @endif
+                                    <!-- Индикатор онлайн-статуса -->
+                                    @if ($request->user->isOnline())
+                                        <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white"></span>
+                                    @endif
+                                </div>
+                                <div>
+                                    <p class="font-medium">{{ $request->user->login }}</p>
+                                    <p class="text-sm text-gray-500">{{ $request->user->email }}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <!-- Кнопка "Принять" -->
+                                <form method="POST" action="{{ route('friends.accept', $request->user) }}">
+                                    @csrf
+                                    <button type="submit" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition-colors duration-300">
+                                        Принять
+                                    </button>
+                                </form>
+                                <!-- Кнопка "Отклонить" -->
+                                <form method="POST" action="{{ route('friends.remove', $request->user) }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-colors duration-300">
+                                        Отклонить
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                    <div class="flex flex-col sm:flex-row items-center gap-2">
-                        <form method="POST" action="{{ route('friends.accept', $request->user) }}">
-                            @csrf
-                            <button type="submit" class="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition-colors duration-300 w-full sm:w-auto">Принять</button>
-                        </form>
-                        <form method="POST" action="{{ route('friends.remove', $request->user) }}">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition-colors duration-300 w-full sm:w-auto">Отклонить</button>
-                        </form>
-                    </div>
-                </div>
-            @endforeach
+                @endforeach
+            </div>
         @else
             <p class="text-gray-500">У вас нет входящих запросов в друзья.</p>
         @endif
@@ -130,7 +167,84 @@
 
     <!-- Секция "Поиск друзей" -->
     <div x-show="activeTab === 'search'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
-        <a href="{{ route('friends.search') }}" class="bg-blue-600 text-white p-2 rounded mb-4 inline-block hover:bg-blue-700 transition-colors duration-300 w-full sm:w-auto text-center">Поиск друзей</a>
+        <a href="{{ route('friends.search') }}" class="bg-blue-500 text-white p-2 rounded mb-4 inline-block hover:bg-blue-600 transition-colors duration-300 w-full sm:w-auto text-center">Поиск друзей</a>
     </div>
 </div>
 @endsection
+
+<style>
+    .gradient-border {
+        padding: 2px; /* Толщина границы */
+        background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+        border-radius: 50%;
+    }
+
+    .gradient-border img {
+        border: 2px solid white; /* Внутренняя граница, чтобы отделить аватар от градиента */
+        border-radius: 50%;
+    }
+
+    .online-indicator {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 10px;
+        height: 10px;
+        background-color: #4CAF50; /* Зеленый цвет */
+        border-radius: 50%;
+        border: 2px solid white; /* Белая обводка */
+    }
+
+    @media (max-width: 700px) {
+        .online-indicator {
+            width: 8px;
+            height: 8px;
+            border-width: 1px;
+        }
+    }
+
+    .button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    background-color: #000000;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+}
+
+.button:hover {
+    background-color: #181818;
+}
+
+.button--remove {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.button--remove:hover {
+    background-color: #e5e5e5;
+}
+
+/* Если хотите сделать кнопку "Удалить" черной */
+.button--remove {
+    background-color: #d40a0a;
+    color: #fff;
+}
+
+.button--remove:hover {
+    background-color: #db0707;
+}
+
+.flex__btns {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+#padding {
+    height: 33px;
+}
+
+</style>

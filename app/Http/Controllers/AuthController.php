@@ -81,7 +81,7 @@ class AuthController extends Controller
 
         // Если авторизация не удалась, вернуть с ошибкой
         return back()->withErrors([
-            'login' => 'Неверные учетные данные.',
+            'login' => 'Неверное имя пользователя или пароль.',
         ]);
     }
 

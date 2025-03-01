@@ -5,9 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Like;
 
 class Post extends Model
 {
+
+
+    
     /**
      * Поля, которые можно массово назначать.
      *
@@ -89,4 +93,19 @@ class Post extends Model
         }
         return null;
     }
+
+    public function likes(): HasMany
+{
+    return $this->hasMany(Like::class);
+}
+
+public function isLikedBy(User $user): bool
+{
+    return $this->likes()->where('user_id', $user->id)->exists();
+}
+
+public function likesCount(): int
+{
+    return $this->likes()->count();
+}
 }

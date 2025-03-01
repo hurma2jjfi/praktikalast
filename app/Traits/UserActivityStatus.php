@@ -45,31 +45,31 @@ trait UserActivityStatus
 
         // Если пользователь был в сети менее 1 минуты назад
         if ($diffInMinutes < 1) {
-            return 'Был в сети только что';
+            return 'Был(а) в сети только что';
         }
 
         // Если пользователь был в сети менее 60 минут назад
         if ($diffInMinutes < 60) {
-            return "Был в сети $diffInMinutes " . $this->pluralize($diffInMinutes, ['минуту', 'минуты', 'минут']) . ' назад';
+            return "Был(а) в сети $diffInMinutes " . $this->pluralize($diffInMinutes, ['минуту', 'минуты', 'минут']) . ' назад';
         }
 
         // Если пользователь был в сети сегодня
         if ($lastSeen->isToday()) {
-            return 'Был в сети сегодня в ' . $lastSeen->format('H:i');
+            return 'Был(а) в сети сегодня в ' . $lastSeen->format('H:i');
         }
 
         // Если пользователь был в сети вчера
         if ($lastSeen->isYesterday()) {
-            return 'Был в сети вчера в ' . $lastSeen->format('H:i');
+            return 'Был(а) в сети вчера в ' . $lastSeen->format('H:i');
         }
 
         // Если пользователь был в сети на этой неделе
         if ($lastSeen->isCurrentWeek()) {
-            return 'Был в сети в ' . $lastSeen->translatedFormat('l в H:i'); // Например, "в понедельник в 15:30"
+            return 'Был(а) в сети в ' . $lastSeen->translatedFormat('l в H:i'); // Например, "в понедельник в 15:30"
         }
 
         // Если пользователь был в сети больше недели назад
-        return 'Был в сети ' . $lastSeen->translatedFormat('j F Y в H:i'); // Например, "5 октября 2023 в 20:00"
+        return 'Был(а) в сети ' . $lastSeen->translatedFormat('j F Y в H:i'); // Например, "5 октября 2023 в 20:00"
     }
 
     /**

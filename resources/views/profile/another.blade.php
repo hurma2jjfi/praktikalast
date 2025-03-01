@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1 class="text-2xl font-bold mb-4">Профиль пользователя: {{ $user->login }}</h1>
+    <h1 class="text-2xl font-bold mb-4">Профиль пользователя: {{ '@' . $user->login }}</h1>
     <div class="bg-white p-4 rounded-lg shadow-md mb-4">
         <div class="flex items-center mb-4">
             <!-- Аватарка пользователя с градиентной границей -->
@@ -23,8 +23,6 @@
                 <p><strong>Email</strong> — {{ $user->email }}</p>
                 <p><strong>Друзей</strong> — {{ $friendCount }}</p>
 
-                
-                
                 <!-- Статус активности -->
                 <div class="flex items-center">
                     @if ($user->isOnline())
@@ -58,8 +56,6 @@
         </div>
     </div>
 
-    
-
     {{-- ///////////////////////////////////////////////////Публикации --}}
     <h1 class="text-2xl font-bold mb-4">Публикации пользователя:</h1>
     <div class="bg-white p-4 rounded-lg shadow-md mb-4">
@@ -69,11 +65,11 @@
         @foreach ($posts as $post)
         <div class="mb-4">
             <h2 class="font-bold">{{ $post->title }}</h2>
-    
+        
             @if($post->image)
                 <img src="{{ asset($post->image) }}" alt="Пост">
             @endif
-    
+        
             @if($post->video)
                 <div class="video-container relative">
                     <video id="myVideo" width="100%" controls>
@@ -81,17 +77,32 @@
                         Ваш браузер не поддерживает тег video.
                     </video>
                     <button id="playButton" class="play-button absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white rounded-full p-2 hover:bg-opacity-75">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M8 5v14l11-7z" />
                         </svg>
                     </button>
                 </div>
             @endif
-    
+        
             <p>{{ $post->content }}</p>
             <p style="font-style: italic">{{'Категория: ' . $post->category->name }}</p>
             <small class="text-gray-500">{{ $post->created_at->diffForHumans() }}</small>
-    
+        
+            <!-- Форма для лайков -->
+            <div class="mt-4">
+                <form action="{{ route('posts.like', $post) }}" method="POST" class="like-form">
+                    @csrf
+                    <button type="submit" class="flex items-center text-red-500 hover:text-red-500">
+                        <svg class="w-6 h-6 like-icon" fill="{{ $post->isLikedBy(Auth::user()) ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                        </svg>
+                        <span class="ml-1 likes-count">{{ $post->likesCount() }}</span>
+                    </button>
+                </form>
+                <canvas class="confetti-canvas" style="position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999;"></canvas>
+            </div>
+            
+        
             <!-- Комментарии к посту -->
             <div class="mt-4">
                 <h3 class="font-bold mb-2">Комментарии:</h3>
@@ -107,7 +118,7 @@
                                 </div>
                             @endif
                         </div>
-    
+        
                         <!-- Текст комментария -->
                         <div>
                             <p><strong>{{ $comment->user->login }}:</strong> {{ $comment->content }}</p>
@@ -116,7 +127,7 @@
                     </div>
                 @endforeach
             </div>
-    
+        
             <!-- Форма для добавления комментария -->
             <form action="{{ route('comments.store', $post) }}" method="POST" class="mt-4">
                 @csrf
@@ -124,13 +135,19 @@
                 <button type="submit" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded">Отправить</button>
             </form>
         </div>
-    @endforeach
+        @endforeach
     
         @endif
     </div>
 @endsection
 
 <style>
+
+.confetti-canvas {
+    width: 100%;
+    height: 100vh;
+}
+
     .gradient-border {
         padding: 4px; /* Толщина границы */
         background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
@@ -163,4 +180,69 @@
             playButton.style.display = 'block'; // Показать кнопку после окончания
         });
     });
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+    // Обработка лайков через AJAX
+    document.querySelectorAll('.like-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); // Отменяем стандартное поведение формы
+
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({}) // Пустое тело запроса
+            })
+            .then(response => response.json())
+            .then(data => {
+                const likeIcon = form.querySelector('.like-icon');
+                const likesCount = form.querySelector('.likes-count');
+
+                // Обновляем иконку лайка
+                if (data.liked) {
+                    likeIcon.setAttribute('fill', 'currentColor'); // Заполненная иконка
+
+                    // Получаем координаты кнопки лайка
+                    const buttonRect = form.querySelector('button').getBoundingClientRect();
+
+                    // Настраиваем canvas для анимации
+                    const canvas = document.querySelector('.confetti-canvas');
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+
+                    // Запускаем анимацию конфетти рядом с кнопкой
+                    confetti({
+                        particleCount: 50, // Количество сердечек
+                        spread: 70, // Разброс
+                        origin: {
+                            x: (buttonRect.left + buttonRect.width / 2) / window.innerWidth, // Центр кнопки по X
+                            y: (buttonRect.top + buttonRect.height / 2) / window.innerHeight // Центр кнопки по Y
+                        },
+                        shapes: ['heart'], // Форма сердечек
+                        colors: ['#ff0000', '#ff6666', '#ff9999'], // Цвета сердечек
+                        scalar: 0.8 // Масштаб сердечек
+                    });
+                } else {
+                    likeIcon.setAttribute('fill', 'none'); // Пустая иконка
+                }
+
+                // Обновляем количество лайков
+                likesCount.textContent = data.likesCount;
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+            });
+        });
+    });
+});
+
+
+
+
+
+
 </script>
