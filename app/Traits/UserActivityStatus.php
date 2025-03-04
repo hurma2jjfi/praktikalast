@@ -80,4 +80,97 @@ trait UserActivityStatus
         $cases = [2, 0, 1, 1, 1, 2];
         return $titles[($number % 100 > 4 && $number % 100 < 20) ? 2 : $cases[min($number % 10, 5)]];
     }
+
+    /**
+     * Проверяет, был ли пользователь активен в течение последних N минут.
+     */
+    public function wasActiveRecently(int $minutes)
+    {
+        return $this->last_activity_at && $this->last_activity_at > now()->subMinutes($minutes);
+    }
+
+    /**
+     * Возвращает время последней активности в формате даты и времени.
+     */
+    public function lastActivityDateTime()
+    {
+        if ($this->last_activity_at) {
+            return Carbon::parse($this->last_activity_at)->translatedFormat('j F Y в H:i');
+        } else {
+            return 'Никогда не был в сети';
+        }
+    }
+
+    /**
+     * Возвращает время последней активности в формате только даты.
+     */
+    public function lastActivityDate()
+    {
+        if ($this->last_activity_at) {
+            return Carbon::parse($this->last_activity_at)->translatedFormat('j F Y');
+        } else {
+            return 'Никогда не был в сети';
+        }
+    }
+
+    /**
+     * Возвращает время последней активности в формате только времени.
+     */
+    public function lastActivityTime()
+    {
+        if ($this->last_activity_at) {
+            return Carbon::parse($this->last_activity_at)->format('H:i');
+        } else {
+            return 'Никогда не был в сети';
+        }
+    }
+
+    /**
+     * Возвращает статус онлайн/оффлайн в виде HTML-бейджа.
+     */
+    public function statusBadge()
+    {
+        if ($this->isOnline()) {
+            return '<span class="badge bg-success">Онлайн</span>';
+        } else {
+            return '<span class="badge bg-secondary">Оффлайн</span>';
+        }
+    }
+
+    /**
+     * Возвращает статус онлайн/оффлайн в виде иконки.
+     */
+    public function statusIcon()
+    {
+        if ($this->isOnline()) {
+            return '<i class="fa fa-circle text-success"></i>';
+        } else {
+            return '<i class="fa fa-circle text-secondary"></i>';
+        }
+    }
+
+    /**
+     * Обновляет статус пользователя как оффлайн.
+     */
+    public function markAsOffline()
+    {
+        $this->is_online = false;
+        $this->save();
+    }
+
+    /**
+     * Проверяет, был ли пользователь активен в течение последних N часов.
+     */
+    public function wasActiveRecentlyHours(int $hours)
+    {
+        return $this->last_activity_at && $this->last_activity_at > now()->subHours($hours);
+    }
+
+    /**
+     * Проверяет, был ли пользователь активен в течение последних N дней.
+     */
+    public function wasActiveRecentlyDays(int $days)
+    {
+        return $this->last_activity_at && $this->last_activity_at > now()->subDays($days);
+    }
 }

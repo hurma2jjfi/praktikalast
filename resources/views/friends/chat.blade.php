@@ -9,8 +9,6 @@
         </div>
     @endif
 
-    
-
     <!-- Статус пользователя (отображается один раз вверху) -->
     <div class="bg-white p-4 rounded-lg border border-gray-200 mb-4">
         <div class="flex items-center mb-4">
@@ -25,7 +23,6 @@
                 @endif
             </div>
 
-            
             <!-- Имя пользователя, индикатор статуса и время последней активности -->
             <div>
                 <p class="font-bold">{{ $firstName }} {{ $lastName }}</p>
@@ -41,28 +38,10 @@
             </div>
         </div>
 
-        <!-- Контейнер для кнопки поиска и инпута -->
-        <div class="flex justify-end mb-4">
-            <div id="searchWrapper" class="relative">
-                <!-- Кнопка для открытия поиска -->
-                <button id="openSearch" class="p-2 text-gray-500 hover:text-blue-500 transition-colors">
-                    <i class="fas fa-search"></i> <!-- Иконка поиска -->
-                </button>
-        
-                <!-- Инпут поиска (изначально скрыт) -->
-                <input type="text" id="searchMessages" placeholder="Поиск сообщений..."
-                       class="absolute top-0 right-0 w-0 p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition-all duration-300"
-                       style="opacity: 0; visibility: hidden;">
-            </div>
-        </div>
-
-        
         <!-- Список сообщений -->
-        <div class="space-y-4" id="messagesContainer">
+        <div class="space-y-4">
             @if ($messages->isEmpty())
-                <div class="text-center text-gray-500">
-                    Пока нет сообщений.
-                </div>
+                <p class="text-gray-500">Пока нет сообщений.</p>
             @else
                 @php
                     $currentDate = null;
@@ -76,7 +55,8 @@
                     @if ($messageDate !== $currentDate)
                         @php
                             $currentDate = $messageDate;
-                            $dateText = getRelativeDate($message->created_at);
+                            // Используйте правильный путь к классу
+                            $dateText = \App\Helpers\DateHelper::getRelativeDate($message->created_at);
                         @endphp
 
                         <div class="text-date-center">
@@ -86,7 +66,7 @@
                         </div>
                     @endif
 
-                    <div class="group flex items-start message {{ $message->user_id == Auth::id() ? 'justify-end' : 'justify-start' }}">
+                    <div class="group flex items-start {{ $message->user_id == Auth::id() ? 'justify-end' : 'justify-start' }}">
                         <!-- Аватарка пользователя -->
                         @if ($message->user_id != Auth::id())
                             <div class="relative w-8 h-8 rounded-full mr-3 gradient-border">
@@ -109,6 +89,7 @@
                                     <small class="text-xs text-gray-500">{{ $message->created_at->format('H:i') }}</small>
                                 </div>
                             </div>
+
                             <!-- Время отправки сообщения и индикатор прочтения -->
                             <div class="mt-1 flex items-center {{ $message->user_id == Auth::id() ? 'justify-end' : 'justify-start' }}">
                                 @if ($message->user_id == Auth::id())
@@ -150,11 +131,6 @@
                 @endforeach
             @endif
         </div>
-
-        <!-- Сообщение "Ничего не найдено" -->
-        <div id="noResultsMessage" class="text-center text-gray-500 hidden">
-            Ничего не найдено.
-        </div>
     </div>
 
     <!-- Форма отправки сообщения -->
@@ -167,24 +143,7 @@
     </form>
 @endsection
 
-@php
-    function getRelativeDate($date) {
-        $now = now();
-        $diff = $now->diffInDays($date);
-
-        if ($diff == 0) {
-            return 'Сегодня';
-        } elseif ($diff == 1) {
-            return 'Вчера';
-        } else {
-            return $date->format('F d'); // Добавляем число к месяцу
-        }
-    }
-@endphp
-
 <style>
-    
-
     .gradient-border {
         padding: 2px; /* Толщина границы */
         background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
@@ -210,163 +169,4 @@
         display: flex;
         justify-content: center;
     }
-
-    .highlight {
-        background-color: rgba(188, 24, 136, 0.1); /* Цвет выделения блока, как в Telegram */
-        border-radius: 8px; /* Закругление углов */
-    }
-
-    .hidden {
-        display: none; /* Скрываем элемент */
-    }
-
-    /* Компактный инпут */
-    #searchMessages {
-        width: 200px; /* Уменьшаем ширину инпута */
-        padding: 6px 12px; /* Уменьшаем отступы */
-        font-size: 14px; /* Уменьшаем размер текста */
-    }
-
-    /* Иконка поиска */
-    #openSearch {
-        font-size: 18px; /* Размер иконки */
-    }
-
-    @keyframes expandInput {
-        0% {
-            width: 0;
-            opacity: 0;
-        }
-        100% {
-            width: 200px;
-            opacity: 1;
-        }
-    }
-
-    /* Анимация сворачивания инпута */
-    @keyframes collapseInput {
-        0% {
-            width: 200px;
-            opacity: 1;
-        }
-        100% {
-            width: 0;
-            opacity: 0;
-        }
-    }
-
-    /* Анимация иконки */
-    @keyframes iconToInput {
-        0% {
-            transform: scale(1);
-            opacity: 1;
-        }
-        100% {
-            transform: scale(0);
-            opacity: 0;
-        }
-    }
-
-    @keyframes inputToIcon {
-        0% {
-            transform: scale(0);
-            opacity: 0;
-        }
-        100% {
-            transform: scale(1);
-            opacity: 1;
-        }
-    }
-
-    /* Применение анимаций */
-    #searchMessages.expand {
-        animation: expandInput 0.3s ease forwards;
-    }
-
-    #searchMessages.collapse {
-        animation: collapseInput 0.3s ease forwards;
-    }
-
-    #openSearch.iconToInput {
-        animation: iconToInput 0.3s ease forwards;
-    }
-
-    #openSearch.inputToIcon {
-        animation: inputToIcon 0.3s ease forwards;
-    }
-
-    /* Стили для кнопки и инпута */
-    #openSearch {
-        font-size: 18px;
-        transition: transform 0.3s ease, opacity 0.3s ease; /* Плавное изменение */
-    }
-
-    #searchMessages {
-        width: 0;
-        opacity: 0;
-        transition: width 0.3s ease, opacity 0.3s ease; /* Плавное изменение */
-    }
 </style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const openSearchButton = document.getElementById('openSearch');
-    const searchInput = document.getElementById('searchMessages');
-    const searchWrapper = document.getElementById('searchWrapper');
-
-    openSearchButton.addEventListener('click', function() {
-        // Задаём ширину инпута
-        searchInput.style.width = '200px';
-        searchInput.style.opacity = '1';
-        searchInput.style.visibility = 'visible';
-        searchInput.focus();
-    });
-
-    searchInput.addEventListener('blur', function() {
-        if (searchInput.value === '') {
-            searchInput.style.width = '0';
-            searchInput.style.opacity = '0';
-            searchInput.style.visibility = 'hidden';
-        }
-    });
-
-    const messagesContainer = document.getElementById('messagesContainer');
-    const noResultsMessage = document.getElementById('noResultsMessage');
-
-    searchInput.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
-        const messages = messagesContainer.querySelectorAll('.message');
-        let foundResults = false;
-
-        if (searchTerm === '') {
-            messages.forEach(message => {
-                message.style.visibility = 'visible';
-                message.classList.remove('highlight');
-            });
-            noResultsMessage.classList.add('hidden');
-            return;
-        }
-
-        messages.forEach(message => {
-            const text = message.textContent.toLowerCase();
-            if (text.includes(searchTerm)) {
-                message.style.visibility = 'visible';
-                message.classList.add('highlight');
-                foundResults = true;
-            } else {
-                message.style.visibility = 'hidden';
-                message.classList.remove('highlight');
-            }
-        });
-
-        if (foundResults) {
-            noResultsMessage.classList.add('hidden');
-        } else {
-            noResultsMessage.classList.remove('hidden');
-        }
-    });
-});
-
-
-
-</script>

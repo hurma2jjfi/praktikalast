@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Chat;
 use App\Models\Message;
+use App\Events\MessageSent;
 
 class FriendController extends Controller
 {
@@ -160,8 +161,12 @@ public function add(Request $request, User $user)
     $firstName = $user->userInfo->first_name ?? '';
     $lastName = $user->userInfo->last_name ?? '';
 
-    return view('friends.chat', compact('messages', 'user', 'firstName', 'lastName'));
+    return view('friends.chat', compact('chat', 'messages', 'user', 'firstName', 'lastName'));
 }
+
+
+
+
 
 
 
@@ -213,11 +218,6 @@ public function deleteMessage(Request $request, Message $message)
 
     return redirect()->back()->with('error', 'Вы не можете удалить чужое сообщение.');
 }
-
-
-
-
-
 
 
 }

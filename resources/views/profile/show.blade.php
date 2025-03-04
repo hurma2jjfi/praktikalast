@@ -1,13 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1 class="text-2xl font-bold mb-4">Профиль пользователя: {{'@' . $user->login }}</h1>
+    <h1 class="text-2xl font-bold mb-4">Профиль:</h1>
     <div class="bg-white p-4 rounded-lg shadow-md mb-4">
         <div class="flex items-center mb-4">
             <!-- Аватарка пользователя с градиентной границей -->
             <div class="relative w-32 h-32 rounded-full mr-4 gradient-border">
                 @if ($user->userInfo && $user->userInfo->avatar)
                     <img src="{{ asset('storage/' . $user->userInfo->avatar) }}" alt="Аватар" class="w-full h-full rounded-full object-cover">
+                    <a style="text-decoration: underline; color: #2563EB; padding-left: 10px;" href="{{ route('profile.edit') }}">Редактировать</a>
                 @else
                     <div class="w-full h-full rounded-full bg-gray-200 flex items-center justify-center">
                         <p class="text-gray-500 text-sm">Аватар не установлен</p>
@@ -39,6 +40,20 @@
             </div>
         </div>
         <div class="flex items-center">
+            <div class="wrapper__btn mr-4">
+                <a style="color: #fff;" href="{{ route('posts.create') }}"><button class="create__a__post"><img src={{ asset('./assets/plusdva.svg') }} alt="">Создать пост</button></a></div>
+                <form action="{{ route('profile.destroy') }}" method="POST" class="mt-4">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="bg-red-500 text-white p-2 rounded hover:bg-red-600 flex items-center"
+                        onclick="return confirm('Вы уверены, что хотите удалить свой аккаунт? Это действие необратимо.')">
+                        <img src={{ asset('./assets/deleteaccount.svg') }} alt="Удалить" class="w-5 h-5 mr-2">
+                        Удалить аккаунт
+                    </button>
+                </form>                
+        </div>
+        
+        <div class="flex items-center">
             @if ($friends->count() > 0)
             <div class="flex items-center mt-2">
                 @foreach ($friends as $friend)
@@ -60,10 +75,10 @@
     </div>
 
     {{-- ///////////////////////////////////////////////////Публикации --}}
-    <h1 class="text-2xl font-bold mb-4">Публикации пользователя:</h1>
+    <h1 class="text-2xl font-bold mb-4">Мои публикации:</h1>
     <div class="bg-white p-4 rounded-lg shadow-md mb-4">
         @if ($posts->isEmpty())
-            <p>У пользователя пока нет постов.</p>
+            <p>У вас пока нет постов.</p>
         @else
         @foreach ($posts as $post)
         <div class="mb-4">
@@ -159,6 +174,39 @@
         border: 4px solid white; /* Внутренняя граница, чтобы отделить аватар от градиента */
         border-radius: 50%;
     }
+
+    .create__a__post {
+  width: 147px;
+  height: 43px;
+  padding: 0 10px; /* Горизонтальный отступ */
+  box-sizing: border-box; /* Чтобы ширина включала padding и border */
+  font-size: 14px; /* Размер шрифта */
+  text-align: center; /* Выравнивание текста */
+  background-color: #2563EB;
+  color: #fff;
+  border-radius: 7px;
+  display: flex; /* Используем flexbox для выравнивания */
+  justify-content: center; /* Горизонтальное выравнивание */
+  align-items: center; /* Вертикальное выравнивание */
+  gap: 10px; /* Расстояние между элементами */
+  flex-wrap: nowrap; /* Элементы не переносятся на новую строку */
+  overflow: hidden; /* Скрытие содержимого, выходящего за пределы */
+}
+
+.create__a__post img {
+  width: 25px; /* Уменьшение размера изображения */
+  height: 25px; /* Уменьшение размера изображения */
+}
+
+.create__a__post a {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden; 
+}
+
+
+
+
 </style>
 
 <script>

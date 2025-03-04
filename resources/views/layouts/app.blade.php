@@ -511,6 +511,7 @@ body.dark p {
         
     </style>
 </head>
+<div id="loading-bar" class="fixed top-0 left-0 h-1 bg-blue-500 z-50" style="width: 0%;"></div>
 <body class="bg-gray-100 dark:bg-gray-900">
     <!-- Кнопка бургер-меню -->
     <button id="sidebar-toggle" class="fixed top-4 left-6 p-2 bg-black text-white rounded-lg leading-none z-50 lg:hidden">
@@ -633,12 +634,54 @@ main {
     flex-grow: 1;
 }
 
-
+#loading-bar {
+    transition: width 0.3s ease;
+}
 
 
     </style>
 
     <script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const loadingBar = document.getElementById('loading-bar');
+
+    // Функция для запуска загрузки
+    function startLoading() {
+        loadingBar.style.width = '50%';
+    }
+
+    // Функция для завершения загрузки
+    function finishLoading() {
+        loadingBar.style.width = '100%';
+        setTimeout(() => {
+            loadingBar.style.width = '0%';
+        }, 300);
+    }
+
+    // Имитация загрузки при переходе по ссылкам
+    document.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', function (e) {
+            if (this.href && this.href !== '#' && !this.href.includes('javascript')) {
+                startLoading();
+                setTimeout(finishLoading, 1000); // Имитация загрузки
+            }
+        });
+    });
+
+    // Имитация загрузки при отправке форм
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function () {
+            startLoading();
+            setTimeout(finishLoading, 1000); // Имитация загрузки
+        });
+    });
+
+    // Завершение загрузки при полной загрузке страницы
+    window.addEventListener('load', function () {
+        finishLoading();
+    });
+});
+
         document.addEventListener('DOMContentLoaded', function () {
             const sidebar = document.getElementById('sidebar');
             const sidebarToggle = document.getElementById('sidebar-toggle');
@@ -728,8 +771,13 @@ main {
 
             setActiveMenuItem();
         });
+
+
+
     </script>
 
+
+<script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>   
 </body>

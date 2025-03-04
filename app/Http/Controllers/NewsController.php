@@ -9,6 +9,18 @@ use Illuminate\Support\Facades\Auth;
 class NewsController extends Controller
 {
     
+    public function getLazy()
+    {
+        $news = News::latest()->get()->map(function ($item) {
+            if ($item->media_path) {
+                $item->media_path = asset('storage/' . $item->media_path);
+            }
+            return $item;
+        });
+
+        return response()->json($news);
+    }
+
     public function index()
     {
         $news = News::orderBy('created_at', 'desc')->get(); 

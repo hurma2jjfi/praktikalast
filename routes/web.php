@@ -58,6 +58,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/news', [NewsController::class, 'index'])->name('news.index');
     Route::get('/news/upload', [NewsController::class, 'create'])->name('news.upload');
     Route::post('/news', [NewsController::class, 'store'])->name('news.store');
+    Route::get('/news/lazy', [NewsController::class, 'getLazy'])->name('news.lazy');
 
     // Post Routes
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
