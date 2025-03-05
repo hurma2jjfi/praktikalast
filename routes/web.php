@@ -10,6 +10,7 @@ use App\Http\Controllers\NewsController;
 use App\Http\Controllers\CommentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LikeController;
+use App\Http\Controllers\AudioController;
 
 /*
 |--------------------------------------------------------------------------
@@ -93,4 +94,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/chats', [ChatController::class, 'index'])->name('chats.index');
     Route::get('/chats/{chat}', [ChatController::class, 'show'])->name('chats.show');
     Route::post('/chats/{chat}/messages', [ChatController::class, 'sendMessage'])->name('chats.messages.store');
+
+
+    Route::get('/audios', [AudioController::class, 'index'])->name('audio.index');
+    Route::get('/audios/upload', [AudioController::class, 'create'])->name('audio.create');
+    Route::post('/audios', [AudioController::class, 'store'])->name('audio.store');
+    Route::get('/audios/{id}', [AudioController::class, 'show'])->name('audio.show');
+    Route::delete('/audios/{id}', [AudioController::class, 'destroy'])->name('audio.destroy');
+
+    
 });

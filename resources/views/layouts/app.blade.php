@@ -564,7 +564,12 @@ body.dark p {
                             @endif
                         @endauth
                     </li>
-                    
+                    <li class="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <a href="{{ route('audio.index') }}" class="block flex items-center">
+                            <i class="fas fa-music mr-2"></i>
+                            <span>Музыка</span>
+                        </a>
+                    </li>
                     <li class="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">
                         <form action="{{ route('logout') }}" method="POST" class="inline">
                             @csrf
@@ -781,6 +786,6 @@ main {
 
 <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>   
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 </body>
 </html>

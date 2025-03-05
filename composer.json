@@ -9,6 +9,7 @@
         "beyondcode/laravel-websockets": "^2.0",
         "fruitcake/laravel-cors": "^3.0",
         "guzzlehttp/guzzle": "^7.2",
+        "james-heinrich/getid3": "^1.9",
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
