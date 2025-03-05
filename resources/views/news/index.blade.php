@@ -161,6 +161,7 @@
                 <!-- Форма для создания новости -->
                 <form action="{{ route('news.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
+                    <h1 class="text-3xl font-bold mb-4 dark:text-white">Поделитесь новостью</h1>
                     <div class="mb-4">
                         <label for="title" class="block text-gray-700">Заголовок</label>
                         <input type="text" name="title" id="title" class="w-full p-2 border rounded" required>
@@ -264,7 +265,7 @@
             const newsFeed = document.getElementById('news-feed');
             try {
                 // Имитация задержки загрузки
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                await new Promise(resolve => setTimeout(resolve, 1000));
 
                 // Загрузка данных с сервера
                 const response = await fetch('/news/lazy'); // Измененный URL

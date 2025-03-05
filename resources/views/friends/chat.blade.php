@@ -83,25 +83,27 @@
                         <!-- Сообщение и информация о пользователе -->
                         <div class="max-w-[70%] relative">
                             <!-- Текст сообщения -->
-                            <div class="p-3 rounded-lg {{ $message->user_id == Auth::id() ? 'bg-blue-100 text-right' : 'bg-gray-100 text-left' }}">
+                            <div class="p-2 rounded-lg {{ $message->user_id == Auth::id() ? 'bg-blue-100 text-right' : 'bg-gray-100 text-left' }}">
                                 <p>{{ $message->content }}</p>
                                 <div class="justify-end">
+                                    <div class="flex__wrp__time">
                                     <small class="text-xs text-gray-500">{{ $message->created_at->format('H:i') }}</small>
+                                    <div class="flex items-center {{ $message->user_id == Auth::id() ? 'justify-end' : 'justify-start' }}">
+                                        @if ($message->user_id == Auth::id())
+                                            <span class="ml-2">
+                                                @if ($message->read_at)
+                                                    <i class="fas fa-check text-green-500"></i>
+                                                @else
+                                                    <i class="fas fa-check text-gray-400"></i>
+                                                @endif
+                                            </span>
+                                        @endif
+                                    </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Время отправки сообщения и индикатор прочтения -->
-                            <div class="mt-1 flex items-center {{ $message->user_id == Auth::id() ? 'justify-end' : 'justify-start' }}">
-                                @if ($message->user_id == Auth::id())
-                                    <span class="ml-2">
-                                        @if ($message->read_at)
-                                            <i class="fas fa-check text-green-500"></i>
-                                        @else
-                                            <i class="fas fa-check text-gray-400"></i>
-                                        @endif
-                                    </span>
-                                @endif
-                            </div>
+                            
 
                             <!-- Кнопка удаления (появляется при наведении) -->
                             @if ($message->user_id == Auth::id())
@@ -144,6 +146,11 @@
 @endsection
 
 <style>
+
+    .flex__wrp__time {
+        display: flex;
+    }
+
     .gradient-border {
         padding: 2px; /* Толщина границы */
         background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);

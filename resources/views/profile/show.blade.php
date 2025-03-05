@@ -31,7 +31,7 @@
                 <!-- Статус активности -->
                 <div class="flex items-center">
                     @if ($user->isOnline())
-                        <span class="text-sm text-gray-500 ml-1 mt-1">Онлайн</span>
+                        <span class="text-sm text-gray-500 mt-1">Онлайн</span>
                     @else
                         <span class="w-2 h-2 bg-gray-400 rounded-full inline-block"></span> <!-- Серый кружок -->
                         <span class="text-sm text-gray-500 ml-1">{{ $user->lastSeen() }}</span>
@@ -50,9 +50,9 @@
                         <img src={{ asset('./assets/deleteaccount.svg') }} alt="Удалить" class="w-5 h-5 mr-2">
                         Удалить аккаунт
                     </button>
-                </form>                
+                </form>
         </div>
-        
+
         <div class="flex items-center">
             @if ($friends->count() > 0)
             <div class="flex items-center mt-2">
@@ -81,16 +81,16 @@
             <p>У вас пока нет постов.</p>
         @else
         @foreach ($posts as $post)
-        <div class="mb-4">
+        <div class="mb-4 border-b border-gray-200 pb-4">
             <h2 class="font-bold">{{ $post->title }}</h2>
-        
+
             @if($post->image)
-                <img src="{{ asset($post->image) }}" alt="Пост">
+                <img src="{{ asset($post->image) }}" alt="Пост" class="my-2 rounded-lg">
             @endif
-        
+
             @if($post->video)
-                <div class="video-container relative">
-                    <video id="myVideo" width="100%" controls>
+                <div class="video-container relative my-2">
+                    <video id="myVideo" width="100%" controls class="rounded-lg">
                         <source src="{{ asset($post->video) }}" type="video/mp4">
                         Ваш браузер не поддерживает тег video.
                     </video>
@@ -101,32 +101,53 @@
                     </button>
                 </div>
             @endif
-        
+
             <p>{{ $post->content }}</p>
-            <p style="font-style: italic">{{'Категория: ' . $post->category->name }}</p>
+            <p class="text-sm text-gray-600 mt-1">{{'Категория: ' . $post->category->name }}</p>
             <small class="text-gray-500">{{ $post->created_at->diffForHumans() }}</small>
-        
-            <!-- Форма для лайков -->
-            <div class="mt-4">
-                <form action="{{ route('posts.like', $post) }}" method="POST" class="like-form">
-                    @csrf
-                    <button type="submit" class="flex items-center text-red-500 hover:text-red-500">
-                        <svg class="w-6 h-6 like-icon" fill="{{ $post->isLikedBy(Auth::user()) ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                        </svg>
-                        <span class="ml-1 likes-count">{{ $post->likesCount() }}</span>
-                    </button>
-                </form>
-                <canvas class="confetti-canvas" style="position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999;"></canvas>
+
+            <!-- Лайки и комментарии -->
+            <div class="flex items-center mt-4 space-x-4">
+            <form action="{{ route('posts.like', $post) }}" method="POST" class="like-form mt-4">
+            @csrf
+            <button type="submit" class="flex items-center text-red-500 hover:text-red-600 relative">
+            <svg class="w-6 h-6 like-icon" fill="{{ $post->isLikedBy(Auth::user()) ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            </svg>
+            <span class="ml-1 likes-count">{{ $post->likesCount() }}</span>
+        <!-- Всплывающий блок с аватарками -->
+        <div class="likes-popup absolute bottom-full left-0 bg-white border border-gray-200 rounded-lg shadow-lg p-2 hidden">
+            <div class="flex flex-wrap gap-2">
+                @foreach ($post->likes as $like)
+                    <div class="relative w-8 h-8 rounded-full item">
+                        @if ($like->user->userInfo && $like->user->userInfo->avatar)
+                            <img src="{{ asset('storage/' . $like->user->userInfo->avatar) }}" alt="Аватар" class="w-full h-full rounded-full object-cover">
+                        @else
+                            <div class="w-full h-full rounded-full bg-gray-200 flex items-center justify-center">
+                                <p class="text-gray-500 text-xs">Аватар</p>
+                            </div>
+                        @endif
+                    </div>
+                @endforeach
             </div>
-        
-            <!-- Комментарии к посту -->
-            <div class="mt-4">
+        </div>
+    </button>
+</form>
+
+                <!-- Иконка комментариев -->
+                <button class="flex items-center text-gray-500 hover:text-gray-700 comment-toggle" data-post-id="{{ $post->id }}">
+                    <img src="{{ asset('./assets/comm.svg') }}" alt="">
+                    <span class="ml-1 comments-count">{{ $post->comments->count() }}</span>
+                </button>
+            </div>
+
+            <!-- Блок комментариев (скрыт по умолчанию) -->
+            <div id="comments-{{ $post->id }}" class="comments-section mt-4 hidden">
                 <h3 class="font-bold mb-2">Комментарии:</h3>
                 @foreach ($post->comments as $comment)
-                    <div class="mb-2 flex items-start">
+                    <div class="mb-2 flex items-start border-b border-gray-200 dark:border-gray-700">
                         <!-- Аватарка пользователя -->
-                        <div class="relative w-14 h-14 rounded-full mr-3 gradient-border">
+                        <div class="relative w-10 h-10 rounded-full mr-3 gradient-border">
                             @if ($comment->user->userInfo && $comment->user->userInfo->avatar)
                                 <img src="{{ asset('storage/' . $comment->user->userInfo->avatar) }}" alt="Аватар" class="w-full h-full rounded-full object-cover">
                             @else
@@ -135,47 +156,74 @@
                                 </div>
                             @endif
                         </div>
-        
+
                         <!-- Текст комментария -->
                         <div>
                             <p><strong>{{ $comment->user->login }}:</strong> {{ $comment->content }}</p>
                             <small class="text-gray-500">{{ $comment->created_at->diffForHumans() }}</small>
+
+                            <!-- Кнопка удаления комментария -->
+                            @if (Auth::id() === $comment->user_id)
+                                <form action="{{ route('comments.destroy', $comment->id) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-red-500 hover:text-red-700">Удалить</button>
+                                </form>
+                            @endif
                         </div>
                     </div>
                 @endforeach
+
+                <!-- Форма для добавления комментария -->
+                <form action="{{ route('comments.store', $post) }}" method="POST" class="mt-4">
+                    @csrf
+                    <textarea name="content" rows="2" class="w-full p-2 border rounded" placeholder="Добавьте комментарий..." required></textarea>
+                    <button type="submit" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Отправить</button>
+                </form>
             </div>
-        
-            <!-- Форма для добавления комментария -->
-            <form action="{{ route('comments.store', $post) }}" method="POST" class="mt-4">
-                @csrf
-                <textarea name="content" rows="2" class="w-full p-2 border rounded" placeholder="Оставьте комментарий..." required></textarea>
-                <button type="submit" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded">Отправить</button>
-            </form>
         </div>
         @endforeach
-    
         @endif
     </div>
 @endsection
 
 <style>
-    .confetti-canvas {
-        width: 100%;
-        height: 100vh;
+.likes-popup {
+        min-width: 150px; /* Минимальная ширина блока */
+        z-index: 1000; /* Чтобы блок был поверх других элементов */
     }
 
     .gradient-border {
-        padding: 4px; /* Толщина границы */
+        padding: 4px;
         background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
         border-radius: 50%;
     }
 
+    
+textarea:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
     .gradient-border img {
-        border: 4px solid white; /* Внутренняя граница, чтобы отделить аватар от градиента */
+        border: 4px solid white;
         border-radius: 50%;
     }
 
-    .create__a__post {
+    .comments-section {
+        transition: opacity 0.3s ease, max-height 0.3s ease;
+    }
+
+    .comment-toggle {
+        transition: color 0.2s ease;
+    }
+
+    .comment-toggle:hover {
+        color: #2563EB;
+    }
+
+     .create__a__post {
   width: 147px;
   height: 43px;
   padding: 0 10px; /* Горизонтальный отступ */
@@ -201,95 +249,117 @@
 .create__a__post a {
   white-space: nowrap;
   text-overflow: ellipsis;
-  overflow: hidden; 
+  overflow: hidden;
 }
 
+/* Дополнительные стили для отображения превью видео */
+.video-container {
+    width: 100%; /* Занимает всю доступную ширину */
+    margin: 10px 0; /* Отступы сверху и снизу */
+}
 
-
-
+.play-button {
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s;
+}
 </style>
 
 <script>
- document.addEventListener('DOMContentLoaded', function() {
-    const video = document.getElementById('myVideo');
-    const playButton = document.getElementById('playButton');
+    document.addEventListener('DOMContentLoaded', function() {
+        // Обработка лайков через AJAX
+        document.querySelectorAll('.like-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const likeIcon = form.querySelector('.like-icon');
+                    const likesCount = form.querySelector('.likes-count');
 
-    playButton.addEventListener('click', function() {
-        if (video.paused) {
-            video.play();
-            playButton.style.display = 'none';
-        } else {
-            video.pause();
-            playButton.style.display = 'block';
-        }
-    });
-
-    video.addEventListener('ended', function() {
-        playButton.style.display = 'block';
-    });
-
-    // Обработка лайков через AJAX и анимации для каждого поста
-    
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Обработка лайков через AJAX
-    document.querySelectorAll('.like-form').forEach(form => {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault(); // Отменяем стандартное поведение формы
-
-            fetch(form.action, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({}) // Пустое тело запроса
-            })
-            .then(response => response.json())
-            .then(data => {
-                const likeIcon = form.querySelector('.like-icon');
-                const likesCount = form.querySelector('.likes-count');
-
-                // Обновляем иконку лайка
-                if (data.liked) {
-                    likeIcon.setAttribute('fill', 'currentColor'); // Заполненная иконка
-
-                    // Получаем координаты кнопки лайка
-                    const buttonRect = form.querySelector('button').getBoundingClientRect();
-
-                    // Настраиваем canvas для анимации
-                    const canvas = document.querySelector('.confetti-canvas');
-                    canvas.width = window.innerWidth;
-                    canvas.height = window.innerHeight;
-
-                    // Запускаем анимацию конфетти рядом с кнопкой
-                    confetti({
-                        particleCount: 50, // Количество сердечек
-                        spread: 70, // Разброс
-                        origin: {
-                            x: (buttonRect.left + buttonRect.width / 2) / window.innerWidth, // Центр кнопки по X
-                            y: (buttonRect.top + buttonRect.height / 2) / window.innerHeight // Центр кнопки по Y
-                        },
-                        shapes: ['heart'], // Форма сердечек
-                        colors: ['#ff0000', '#ff6666', '#ff9999'], // Цвета сердечек
-                        scalar: 0.8 // Масштаб сердечек
-                    });
-                } else {
-                    likeIcon.setAttribute('fill', 'none'); // Пустая иконка
-                }
-
-                // Обновляем количество лайков
-                likesCount.textContent = data.likesCount;
-            })
-            .catch(error => {
-                console.error('Ошибка:', error);
+                    if (data.liked) {
+                        likeIcon.setAttribute('fill', 'currentColor');
+                        confetti({
+                            particleCount: 50,
+                            spread: 70,
+                            origin: {
+                                x: (form.getBoundingClientRect().left + form.offsetWidth / 2) / window.innerWidth,
+                                y: (form.getBoundingClientRect().top + form.offsetHeight / 2) / window.innerHeight
+                            },
+                            shapes: ['heart'],
+                            colors: ['#ff0000', '#ff6666', '#ff9999'],
+                            scalar: 0.8
+                        });
+                    } else {
+                        likeIcon.setAttribute('fill', 'none');
+                    }
+                    likesCount.textContent = data.likesCount;
+                })
+                .catch(error => console.error('Ошибка:', error));
             });
         });
+
+        // Открытие/закрытие комментариев
+        document.querySelectorAll('.comment-toggle').forEach(button => {
+            button.addEventListener('click', function() {
+                const postId = this.getAttribute('data-post-id');
+                const commentsSection = document.getElementById(`comments-${postId}`);
+                commentsSection.classList.toggle('hidden');
+            });
+        });
+
+        const video = document.getElementById('myVideo');
+        const playButton = document.getElementById('playButton');
+
+        playButton.addEventListener('click', function() {
+            if (video.paused) {
+                video.play();
+                playButton.style.display = 'none';
+            } else {
+                video.pause();
+                playButton.style.display = 'block';
+            }
+        });
+
+        video.addEventListener('ended', function() {
+            playButton.style.display = 'block';
+        });
+    });
+
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+    // Обработка наведения на кнопку лайка
+    document.querySelectorAll('.like-form button').forEach(button => {
+        const popup = button.querySelector('.likes-popup');
+
+        // Проверяем, есть ли лайки
+        const hasLikes = popup && popup.querySelector('.item'); // Проверяем наличие аватарок
+
+        if (hasLikes) {
+            button.addEventListener('mouseenter', function() {
+                popup.classList.remove('hidden');
+            });
+
+            button.addEventListener('mouseleave', function() {
+                popup.classList.add('hidden');
+            });
+        } else {
+            // Если лайков нет, скрываем блок
+            if (popup) {
+                popup.classList.add('hidden');
+            }
+        }
     });
 });
-
-
-
 </script>
+
+

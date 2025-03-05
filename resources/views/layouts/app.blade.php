@@ -607,7 +607,9 @@ body.dark p {
     <footer id="footer" class="p-6 mt-8 bg-white dark:bg-gray-800 dark:text-white lg:ml-64">
         <div class="container mx-auto flex justify-between items-center">
             <div>
-                <p>&copy; {{ date('Y') }} СоцСеть. Все права защищены.</p>
+                <a href="/" class="text-xl font-bold flex items-center">
+                    <img width="150" height="150" src="{{ asset('assets/logopt2dark.svg') }}" alt="Logo">
+                </a>
             </div>
             <div class="flex space-x-4">
                 <a href="{{ route('news.index') }}" class="hover:text-blue-400 dark:hover:text-gray-400">Новости</a>

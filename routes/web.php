@@ -40,7 +40,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::get('/profile/{user}', [ProfileController::class, 'showAnother'])->name('profile.another');
     Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
-    // Route::get('/profile/show', [ProfileController::class, 'show'])->name('profile.show');
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])
+    ->middleware('auth')
+    ->name('comments.destroy');
     Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/update-password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
     Route::delete('/profile/delete', [ProfileController::class, 'delete'])->name('profile.delete');

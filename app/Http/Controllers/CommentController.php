@@ -23,4 +23,20 @@ class CommentController extends Controller
 
         return back()->with('success', 'Комментарий успешно добавлен.');
     }
+
+
+    public function destroy(Comment $comment)
+    {
+        // Проверяем, является ли текущий пользователь автором комментария
+        if (Auth::id() !== $comment->user_id) {
+            return back()->with('error', 'У вас нет прав на удаление этого комментария.');
+        }
+
+        $comment->delete();
+
+        return back()->with('success', 'Комментарий успешно удален.');
+    }
+
+
+
 }
