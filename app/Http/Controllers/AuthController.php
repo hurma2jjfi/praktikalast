@@ -65,25 +65,38 @@ class AuthController extends Controller
 
 
 
-    public function login(Request $request)
-    {
-        // Валидация входящих данных
-        $validated = $request->validate([
-            'login' => 'required',
-            'password' => 'required',
-        ]);
+public function login(Request $request)
+{
+    // Валидация входящих данных
+    $validated = $request->validate([
+        'login' => 'required',
+        'password' => 'required',
+    ]);
 
-        // Попытка авторизации пользователя
-        if (Auth::attempt(['login' => $validated['login'], 'password' => $validated['password']])) {
-            // Успешная авторизация, перенаправление на профиль
-            return redirect()->route('news.index');
+    if (Auth::attempt(['login' => $validated['login'], 'password' => $validated['password']])) {
+
+        $user = Auth::user();
+
+        if($user->is_banned) {
+            Auth::logout();
+            return redirect()->back()->with('message', 'Ваш аккаунт заблокирован');
+
         }
 
-        // Если авторизация не удалась, вернуть с ошибкой
-        return back()->withErrors([
-            'login' => 'Неверное имя пользователя или пароль.',
-        ]);
+
+        if ($user->is_admin) {
+
+            return redirect()->route('admin.admin');
+        } else {
+
+            return redirect()->route('news.index');
+        }
     }
+
+    return back()->withErrors([
+        'login' => 'Неверное имя пользователя или пароль.',
+    ]);
+}
 
     public function logout()
 {

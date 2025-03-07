@@ -1,34 +1,37 @@
 <template>
-    <div class="bg-gray-100 p-6 rounded-lg">
+    <div class="audio-player">
         <!-- Аудио элемент -->
-        <audio ref="audio" :src="audioSrc" @timeupdate="updateProgress" @loadedmetadata="setDuration"></audio>
+        <audio ref="audio" :src="audioSrc" @timeupdate="updateProgress" @loadedmetadata="setDuration" @play="onPlay" @pause="onPause"></audio>
+
+        <!-- Обложка -->
+        <img v-if="coverSrc" :src="coverSrc" alt="Обложка" class="cover-image" :class="{ 'cover-animate': isPlaying }">
 
         <!-- Визуализация звука -->
-        <div class="relative h-20 mb-4">
-            <canvas ref="visualizer" class="absolute top-0 left-0 w-full h-full"></canvas>
+        <div class="visualizer">
+            <canvas ref="visualizer" class="visualizer-canvas"></canvas>
         </div>
 
         <!-- Прогресс-бар -->
-        <div class="flex items-center space-x-4 mb-4">
-            <span class="text-sm text-gray-600">{{ currentTimeFormatted }}</span>
-            <input 
-                type="range" 
-                v-model="progress" 
-                class="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer" 
-                @input="seek" 
+        <div class="progress-bar">
+            <span class="time">{{ currentTimeFormatted }}</span>
+            <input
+                type="range"
+                v-model="progress"
+                class="progress-range"
+                @input="seek"
                 @click.stop="handleClickOnProgressBar($event)"
             >
-            <span class="text-sm text-gray-600">{{ durationFormatted }}</span>
+            <span class="time">{{ durationFormatted }}</span>
         </div>
 
         <!-- Управление воспроизведением -->
-        <div class="flex justify-center space-x-6">
-            <button @click="togglePlay" class="p-3 bg-gray-200 rounded-full hover:bg-gray-300 transition duration-200">
-                <PlayIcon v-if="!isPlaying" class="w-6 h-6 text-gray-600" />
-                <PauseIcon v-else class="w-6 h-6 text-gray-600" />
+        <div class="controls">
+            <button @click="togglePlay" class="control-button">
+                <PlayIcon v-if="!isPlaying" class="icon" />
+                <PauseIcon v-else class="icon" />
             </button>
-            <button @click="restart" class="p-3 bg-gray-200 rounded-full hover:bg-gray-300 transition duration-200">
-                <RefreshIcon class="w-6 h-6 text-gray-600" />
+            <button @click="restart" class="control-button">
+                <RefreshIcon class="icon" />
             </button>
         </div>
     </div>
@@ -47,6 +50,10 @@ export default {
         audioSrc: {
             type: String,
             required: true,
+        },
+        coverSrc: {
+            type: String,
+            required: false,
         },
     },
     data() {
@@ -75,29 +82,24 @@ export default {
             const audio = this.$refs.audio;
             if (this.isPlaying) {
                 audio.pause();
+                this.isPlaying = false;
             } else {
                 audio.play();
                 this.initVisualizer();
+                this.isPlaying = true;
             }
-            this.isPlaying = !this.isPlaying;
         },
         seek() {
             const audio = this.$refs.audio;
             if (this.audioReady && audio.readyState === 4) {
-                console.log('Перемотка на:', (this.progress / 100) * this.duration);
-                // Добавление небольшой задержки перед перемоткой
                 setTimeout(() => {
                     audio.currentTime = (this.progress / 100) * this.duration;
-                    console.log('Текущее время после перемотки:', audio.currentTime);
-                    // Обновление прогресс-бара сразу после перемотки
                     this.updateProgress();
-                }, 50); // Задержка в 50 мс
+                }, 50);
             } else {
-                console.log('Аудио не готово к перемотке');
-                setTimeout(() => this.seek(), 100); // Повторная попытка через 100 мс
+                setTimeout(() => this.seek(), 100);
             }
         },
-
         updateProgress() {
             const audio = this.$refs.audio;
             this.currentTime = audio.currentTime;
@@ -107,18 +109,15 @@ export default {
             this.duration = this.$refs.audio.duration;
             this.$refs.audio.addEventListener('canplaythrough', () => {
                 this.audioReady = true;
-                console.log('Аудио готово к перемотке');
             });
-            // Обновление прогресс-бара при изменении времени воспроизведения
             this.$refs.audio.addEventListener('timeupdate', () => {
                 this.updateProgress();
             });
         },
-
         formatTime(time) {
             const minutes = Math.floor(time / 60);
             const seconds = Math.floor(time % 60);
-            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
         },
         restart() {
             const audio = this.$refs.audio;
@@ -132,19 +131,21 @@ export default {
             const audio = this.$refs.audio;
             const canvas = this.$refs.visualizer;
 
-            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            this.analyser = this.audioContext.createAnalyser();
-            const source = this.audioContext.createMediaElementSource(audio);
-            source.connect(this.analyser);
-            this.analyser.connect(this.audioContext.destination);
+            if (!this.audioContext) {
+              this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+              this.analyser = this.audioContext.createAnalyser();
+              const source = this.audioContext.createMediaElementSource(audio);
+              source.connect(this.analyser);
+              this.analyser.connect(this.audioContext.destination);
 
-            this.analyser.fftSize = 256;
-            const bufferLength = this.analyser.frequencyBinCount;
-            this.dataArray = new Uint8Array(bufferLength);
+              this.analyser.fftSize = 256;
+              const bufferLength = this.analyser.frequencyBinCount;
+              this.dataArray = new Uint8Array(bufferLength);
 
-            this.canvasCtx = canvas.getContext('2d');
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
+              this.canvasCtx = canvas.getContext('2d');
+              canvas.width = canvas.offsetWidth;
+              canvas.height = canvas.offsetHeight;
+            }
 
             this.drawVisualizer();
         },
@@ -180,6 +181,12 @@ export default {
             const progress = (x / event.target.offsetWidth) * 100;
             this.progress = progress;
             this.seek();
+        },
+        onPlay() {
+            this.isPlaying = true;
+        },
+        onPause() {
+            this.isPlaying = false;
         },
     },
     beforeUnmount() {

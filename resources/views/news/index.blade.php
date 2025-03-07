@@ -281,18 +281,26 @@
                     let mediaContent = '';
 
                     if (item.media_path) {
-                        if (item.media_path.endsWith('.mp4') || item.media_path.endsWith('.mov')) {
-                            // Отображаем видео сразу
-                            mediaContent = `
-                                <video controls class="mt-2 rounded-lg w-full" loading="lazy">
-                                    <source src="${item.media_path}" type="video/mp4">
-                                </video>
-                            `;
-                        } else {
-                            // Отображаем обычное изображение
-                            mediaContent = `<img src="${item.media_path}" alt="Изображение" class="mt-2 rounded-lg w-full" loading="lazy" style="object-fit: cover; height: 200px;">`;
-                        }
-                    }
+    if (item.media_path.endsWith('.mp4')) {
+        // Отображаем видео в формате MP4
+        mediaContent = `
+            <video controls preload="metadata" class="mt-2 rounded-lg w-full" loading="lazy">
+                <source src="${item.media_path}" type="video/mp4">
+            </video>
+        `;
+    } else if (item.media_path.endsWith('.mov')) {
+        // Отображаем видео в формате MOV
+        mediaContent = `
+            <video controls preload="metadata" class="mt-2 rounded-lg w-full" loading="lazy">
+                <source src="${item.media_path}" type="video/quicktime">
+            </video>
+        `;
+    } else {
+        // Отображаем обычное изображение
+        mediaContent = `<img src="${item.media_path}" alt="Изображение" class="mt-2 rounded-lg w-full" loading="lazy" style="object-fit: cover; height: 200px;">`;
+    }
+}
+
 
                     newsItem.innerHTML = `
                         <div class="flex justify-between items-center mb-2">

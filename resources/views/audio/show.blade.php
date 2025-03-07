@@ -8,11 +8,11 @@
             <!-- Обложка и основная информация -->
             <div class="flex flex-col items-center text-center mb-8">
                 @if($audio->cover_path)
-                    <img src="{{ asset('storage/' . $audio->cover_path) }}" alt="Обложка" class="rounded-lg w-48 h-48 object-cover mb-4">
+                    <!-- Обложка будет вращаться при воспроизведении -->
                 @endif
                 <h1 class="text-3xl font-bold text-gray-800">{{ $audio->title }}</h1>
                 <p class="text-gray-600">{{ $audio->artist }}</p>
-                <p class="text-gray-600">{{ $audio->duration }} сек.</p>
+                <p class="text-gray-600">{{ floor($audio->duration / 60) }} мин. {{ $audio->duration % 60}} сек.</p>
             </div>
 
             <!-- Описание трека -->
@@ -21,7 +21,7 @@
             </div>
 
             <!-- Плеер -->
-            <audio-player :audio-src="'{{ asset('storage/' . $audio->file_path) }}'"></audio-player>
+            <audio-player :audio-src="'{{ asset('storage/' . $audio->file_path) }}'" :cover-src="'{{ asset('storage/' . $audio->cover_path) }}'"></audio-player>
 
             <!-- Кнопка удаления -->
             <form action="{{ route('audio.destroy', $audio->id) }}" method="POST" class="mt-6 text-center">

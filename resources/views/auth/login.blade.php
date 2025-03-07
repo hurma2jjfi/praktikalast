@@ -3,6 +3,9 @@
 @section('content')
     <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-sm border border-gray-100">
         <h2 class="text-2xl font-bold mb-6 text-gray-800">Вход</h2>
+        @if (session('message'))
+        <p class="text-red-500 text-xs italic mb-2">{{ session('message') }}</p>
+        @endif
         <form method="POST" action="{{ route('login') }}">
             @csrf
             <div class="mb-5 relative">

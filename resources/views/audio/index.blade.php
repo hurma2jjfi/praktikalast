@@ -132,18 +132,19 @@
             <!-- Кнопки управления -->
             <div class="flex items-center space-x-4">
                 <button id="prev-button" class="bg-black bg-opacity-90 rounded-full p-2 hover:bg-opacity-90 transition duration-200">
-                    <img src="{{ asset('./assets/Group 258.svg') }}" alt="Предыдущий" class="w-4 h-4">
+                    <img src="{{ asset('./assets/Group 258.svg') }}" alt="Предыдущий" class="w-3 h-3">
                 </button>
                 <button id="global-play-pause" class="bg-black bg-opacity-90 rounded-full p-2 hover:bg-opacity-90 transition duration-200">
-                    <img id="global-play-icon" src="{{ asset('./assets/Polygon 2.svg') }}" alt="" class="w-4 h-4">
-                    <img id="global-pause-icon" src="{{ asset('./assets/Group 256.svg') }}" alt="" class="w-4 h-4 hidden">
+                    <img id="global-play-icon" src="{{ asset('./assets/Polygon 2.svg') }}" alt="" class="w-3 h-3">
+                    <img id="global-pause-icon" src="{{ asset('./assets/Group 256.svg') }}" alt="" class="w-3 h-3 hidden">
                 </button>
                 <button id="next-button" class="bg-black bg-opacity-90 rounded-full p-2 hover:bg-opacity-90 transition duration-200">
-                    <img src="{{ asset('./assets/Group 257.svg') }}" alt="Следующий" class="w-4 h-4">
+                    <img src="{{ asset('./assets/Group 257.svg') }}" alt="Следующий" class="w-3 h-3">
                 </button>
             </div>
         </div>
     </div>
+
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -416,6 +417,9 @@
         element.textContent = formattedDuration;
     });
 });
+
+
+
 
 </script>
 

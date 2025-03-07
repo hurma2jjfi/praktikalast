@@ -11,6 +11,7 @@ use App\Http\Controllers\CommentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\AudioController;
+use App\Http\Controllers\AdminController;
 
 /*
 |--------------------------------------------------------------------------
@@ -102,5 +103,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/audios/{id}', [AudioController::class, 'show'])->name('audio.show');
     Route::delete('/audios/{id}', [AudioController::class, 'destroy'])->name('audio.destroy');
 
+
+
+
+    //admin
+    Route::get('/admin', [AdminController::class, 'showAdmin'])->name('admin.admin');
+    Route::post('/admin/add-category', [AdminController::class, 'addCategory'])->name('admin.addCategory');
+    Route::post('/admin/ban-user/{id}', [AdminController::class, 'banUser'])->name('admin.banUser');
+    Route::post('/admin/unban-user/{id}', [AdminController::class, 'unbanUser'])->name('admin.unbanUser');
     
 });
+
+
