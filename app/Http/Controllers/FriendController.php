@@ -16,6 +16,9 @@ class FriendController extends Controller
 {
     $user = Auth::user();
 
+
+    $users = User::where('is_admin', '!=', 1)->get();
+
     // Получаем список друзей
     $friends = Friend::where('status', 'Принято')
         ->where(function($query) use ($user) {
@@ -35,7 +38,7 @@ class FriendController extends Controller
     // Считаем количество непросмотренных запросов
     $friendRequestsCount = $friendRequests->count();
 
-    return view('friends.index', compact('friends', 'friendRequests', 'friendRequestsCount'));
+    return view('friends.index', compact('users', 'friends', 'friendRequests', 'friendRequestsCount'));
 }
 
 
@@ -43,17 +46,28 @@ class FriendController extends Controller
 public function search(Request $request)
 {
     $searchTerm = $request->input('search');
-    
+
     // Изменяем запрос для исключения текущего пользователя
     $users = User::where('id', '!=', Auth::id()) // Исключаем текущего пользователя
                  ->where(function ($query) use ($searchTerm) {
                      $query->where('login', 'like', '%'.$searchTerm.'%')
-                           ->orWhere('email', 'like', '%'.$searchTerm.'%');
+                           ->orWhere('email', 'like', '%'.$searchTerm.'%')
+                           ->orWhereHas('userInfo', function ($query) use ($searchTerm) {
+                               $query->where('first_name', 'like', '%'.$searchTerm.'%')
+                                     ->orWhere('last_name', 'like', '%'.$searchTerm.'%');
+                           });
                  })
                  ->get();
 
+    // Загружаем информацию о пользователях
+    $users->each(function ($user) {
+        $user->firstName = $user->userInfo->first_name ?? '';
+        $user->lastName = $user->userInfo->last_name ?? '';
+    });
+
     return view('friends.search', compact('users'));
 }
+
 
 
 
@@ -86,6 +100,20 @@ public function add(Request $request, User $user)
     $friend->friend_id = $user->id;
     $friend->status = 'В ожидании'; // Устанавливаем статус как 'В ожидании'
     $friend->save();
+
+    // Проверка существования чата
+    if (!Chat::where(function($query) use ($user) {
+        $query->where('user1_id', Auth::id())
+              ->where('user2_id', $user->id)
+              ->orWhere('user1_id', $user->id)
+              ->where('user2_id', Auth::id());
+    })->exists()) {
+        // Создание новой записи в таблице chats
+        $chat = new Chat();
+        $chat->user1_id = Auth::id();
+        $chat->user2_id = $user->id;
+        $chat->save();
+    }
 
     return redirect()->route('friends.index')->with('success', 'Запрос на дружбу отправлен.');
 }
@@ -173,12 +201,10 @@ public function add(Request $request, User $user)
 
 public function sendMessage(Request $request, User $user)
 {
-    // Валидация сообщения
     $request->validate([
         'content' => 'required|string|max:255',
     ]);
 
-    // Получаем или создаем чат между пользователями
     $chat = Chat::where(function ($query) use ($user) {
         $query->where('user1_id', Auth::id())
               ->where('user2_id', $user->id);
@@ -187,7 +213,6 @@ public function sendMessage(Request $request, User $user)
               ->where('user2_id', Auth::id());
     })->first();
 
-    // Если чат не найден, создаем новый
     if (!$chat) {
         $chat = Chat::create([
             'user1_id' => Auth::id(),
@@ -195,17 +220,22 @@ public function sendMessage(Request $request, User $user)
         ]);
     }
 
-    // Создаем новое сообщение
-    Message::create([
+    $message = Message::create([
         'chat_id' => $chat->id,
         'user_id' => Auth::id(),
         'content' => $request->content,
         'read_at' => null,
     ]);
+
     
 
-    return redirect()->route('friends.chat', $user)->with('success', 'Сообщение отправлено.');
+    $currentUser = Auth::user();
+
+    broadcast(new MessageSent($message, $currentUser, $chat))->toOthers();
+
+    return response()->json(['message' => 'Сообщение отправлено.'], 200);
 }
+
 
 public function deleteMessage(Request $request, Message $message)
 {
@@ -218,6 +248,9 @@ public function deleteMessage(Request $request, Message $message)
 
     return redirect()->back()->with('error', 'Вы не можете удалить чужое сообщение.');
 }
+
+
+
 
 
 }

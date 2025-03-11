@@ -181,29 +181,33 @@
         }
 
         .form__wrapper .field__category {
-            width: 100%; /* Ширина инпута */
-            height: 43px;
-            background: none;
-            border: 1px solid #fff;
-            border-radius: 20px;
-            color: #fff;
-            font-size: 16px;
-            padding: 0 20px;
-            font-family: "JetBrains Mono", monospace;
-            outline: none;
-        }
+    width: 100%; /* Ширина инпута */
+    height: 43px;
+    background: none;
+    border: 1px solid #fff;
+    border-radius: 20px;
+    color: #fff;
+    font-size: 16px;
+    padding: 0 20px;
+    font-family: "JetBrains Mono", monospace;
+    outline: none;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Добавляем переходы */
+}
 
-        .form__wrapper .field__category::placeholder {
-            color: #ccc;
-            font-size: 16px;
-            font-family: "JetBrains Mono", monospace;
-            font-weight: lighter;
-        }
+.form__wrapper .field__category::placeholder {
+    color: #ccc;
+    font-size: 16px;
+    font-family: "JetBrains Mono", monospace;
+    font-weight: lighter;
+}
 
-        .form__wrapper .field__category:focus {
-            border-color: #8128BC;
-            transition: 0.4s;
-        }
+.form__wrapper .field__category:focus {
+    border-color: #8128BC;
+    border: 2px solid #8128BC;
+    box-shadow: 0 0 0 0.2rem rgba(128, 40, 188, 0.25); 
+    transition: 0.4s; 
+}
+
 
         .radio__flex {
             display: grid;
@@ -438,6 +442,60 @@
 
 
 
+        .wrapperGetCategory {
+            display: none;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            padding: 20px;
+            background-color: #1A1A28;
+            border-radius: 20px;
+            border-left: 1px dashed #8128BC;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .category-card {
+            background-color: #2d2d3e;
+            border-radius: 10px;
+            padding: 15px;
+            color: #fff;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .tab {
+            cursor: pointer;
+            padding: 10px 20px;
+            background-color: #1A1A28;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            color: #fff;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .tab.active {
+            background-color: #8128BC;
+        }
+
+        .tab:hover {
+            background-color: #8128BC;
+        }
+
+        .text-center {
+            margin-bottom: 20px;
+            margin-top: 20px;
+        }
+
+        
+
+
         
     </style>
 </head>
@@ -500,6 +558,19 @@
                     </form>
                 </div>
             </div>
+
+        
+                <!-- Табы для управления видимостью категорий -->
+                <div class="tab" onclick="toggleCategories()">Показать все категории</div>
+        
+                <!-- Контейнер для категорий -->
+                <div class="wrapperGetCategory" id="categoriesContainer">
+                    @foreach($categories as $category)
+                        <div class="category-card">
+                            {{ $category->name }}
+                        </div>
+                    @endforeach
+              
         </div>
         
        
@@ -582,8 +653,34 @@
             <span>Выйти</span>
         </button>
     </form>
+
+
+    
+
+
+
+
+
     <script>
-        const dpr = window.devicePixelRatio || 1;
+
+        
+            function toggleCategories() {
+            const categoriesContainer = document.getElementById('categoriesContainer');
+            const tab = document.querySelector('.tab');
+
+            if (categoriesContainer.style.display === 'none' || categoriesContainer.style.display === '') {
+                categoriesContainer.style.display = 'grid';
+                tab.classList.add('active');
+            } else {
+                categoriesContainer.style.display = 'none';
+                tab.classList.remove('active');
+            }
+        }
+
+
+
+
+const dpr = window.devicePixelRatio || 1;
 
 function adjustCanvas(canvas, width, height) {
     canvas.width = width * dpr;

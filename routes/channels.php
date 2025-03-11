@@ -34,3 +34,8 @@ Broadcast::channel('chat.{chatId}', function ($user, $chatId) {
 
     return $chat !== null;
 });
+
+
+Broadcast::channel('user.status.{userId}', function ($user, $userId) {
+    return (int) $user->id === (int) $userId;
+});
