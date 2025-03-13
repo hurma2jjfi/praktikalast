@@ -179,7 +179,11 @@
         }
 
         .form__wrapper .field__category {
+<<<<<<< HEAD
     width: 100%;
+=======
+    width: 100%; /* Ширина инпута */
+>>>>>>> 0ea16542f60233701765c793525cf1dd74cf23b8
     height: 43px;
     background: none;
     border: 1px solid #fff;
@@ -189,7 +193,11 @@
     padding: 0 20px;
     font-family: "JetBrains Mono", monospace;
     outline: none;
+<<<<<<< HEAD
     transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+=======
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Добавляем переходы */
+>>>>>>> 0ea16542f60233701765c793525cf1dd74cf23b8
 }
 
 .form__wrapper .field__category::placeholder {
@@ -202,8 +210,13 @@
 .form__wrapper .field__category:focus {
     border-color: #8128BC;
     border: 2px solid #8128BC;
+<<<<<<< HEAD
     box-shadow: 0 0 0 0.2rem rgba(128, 40, 188, 0.25);
     transition: 0.4s;
+=======
+    box-shadow: 0 0 0 0.2rem rgba(128, 40, 188, 0.25); 
+    transition: 0.4s; 
+>>>>>>> 0ea16542f60233701765c793525cf1dd74cf23b8
 }
 
 
@@ -491,10 +504,17 @@
             margin-top: 20px;
         }
 
+<<<<<<< HEAD
 
 
 
 
+=======
+        
+
+
+        
+>>>>>>> 0ea16542f60233701765c793525cf1dd74cf23b8
     </style>
 </head>
 <body>
@@ -557,10 +577,17 @@
                 </div>
             </div>
 
+<<<<<<< HEAD
 
                 <!-- Табы для управления видимостью категорий -->
                 <div class="tab" onclick="toggleCategories()">Показать все категории</div>
 
+=======
+        
+                <!-- Табы для управления видимостью категорий -->
+                <div class="tab" onclick="toggleCategories()">Показать все категории</div>
+        
+>>>>>>> 0ea16542f60233701765c793525cf1dd74cf23b8
                 <!-- Контейнер для категорий -->
                 <div class="wrapperGetCategory" id="categoriesContainer">
                     @foreach($categories as $category)
@@ -568,7 +595,11 @@
                             {{ $category->name }}
                         </div>
                     @endforeach
+<<<<<<< HEAD
 
+=======
+              
+>>>>>>> 0ea16542f60233701765c793525cf1dd74cf23b8
         </div>
 
 
@@ -651,9 +682,15 @@
             <span>Выйти</span>
         </button>
     </form>
+<<<<<<< HEAD
 
 
 
+=======
+
+
+    
+>>>>>>> 0ea16542f60233701765c793525cf1dd74cf23b8
 
 
 
@@ -661,7 +698,11 @@
 
     <script>
 
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> 0ea16542f60233701765c793525cf1dd74cf23b8
             function toggleCategories() {
             const categoriesContainer = document.getElementById('categoriesContainer');
             const tab = document.querySelector('.tab');

@@ -165,8 +165,12 @@
 }
 
 
+<<<<<<< HEAD
                     newsItem.innerHTML = `
 
+=======
+                    newsItem.innerHTML = ` 
+>>>>>>> 0ea16542f60233701765c793525cf1dd74cf23b8
                         <h2 class="text-xl font-semibold mb-2 dark:text-white">${item.title}</h2>
                         <p class="mb-4 text-gray-600 dark:text-gray-300">${item.content}</p>
                         ${mediaContent}
