@@ -28,7 +28,7 @@
 
                         <!-- Информация о собеседнике и статус активности -->
                         <div class="flex-1">
-                            <p class="font-medium">{{ $otherUser->login }}</p>
+                            <p class="font-medium">{{ $otherUser->userInfo->first_name ?? '' }} {{ $otherUser->userInfo->last_name ?? '' }}</p>
                             <div class="flex items-center mt-1">
                                 @if ($otherUser->isOnline())
                                     <span class="w-2 h-2 bg-green-500 rounded-full inline-block"></span>
@@ -73,5 +73,9 @@
     /* Hover-эффект для диалогов */
     .hover\:bg-gray-50:hover {
         background-color: #f9fafb; /* Легкий серый фон при наведении */
+    }
+
+    .font-medium:hover {
+        text-decoration: underline;
     }
 </style>

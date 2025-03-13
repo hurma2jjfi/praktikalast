@@ -207,15 +207,17 @@
     padding: 6px 12px;
     border: none;
     border-radius: 4px;
-    background-color: #000000;
+    background-color: #2563EB;
     color: #ffffff;
     cursor: pointer;
     font-size: 14px;
-    transition: background-color 0.2s ease;
+    transition: all 0.3s ease;
+    
 }
 
 .button:hover {
-    background-color: #181818;
+    background-color: #000000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Добавляет тень при наведении */
 }
 
 .button--remove {

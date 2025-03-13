@@ -20,8 +20,8 @@
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid #2d2d3e;
-            background-color: #1A1A28; /* Фоновый цвет ячеек */
-            color: #fff; /* Цвет текста */
+            background-color: #1A1A28;
+            color: #fff;
         }
 
         .grid-3 th {
@@ -31,37 +31,37 @@
         }
 
         .grid-3 tbody tr:nth-child(even) {
-            background-color: #1e1e2d; /* Чередование цветов строк */
+            background-color: #1e1e2d;
         }
 
         .grid-3 tbody tr:hover {
-            background-color: #33334d; /* Подсветка при наведении */
+            background-color: #33334d;
             transition: background-color 0.3s ease;
         }
 
         .grid-3 img {
-            border-radius: 50%; /* Сделать аватар круглым */
-            object-fit: cover; /* Обрезать аватар по кругу */
+            border-radius: 50%;
+            object-fit: cover;
         }
 
         .grid-3 td:first-child {
-            width: 70px; /* Ширина столбца с аватарами */
+            width: 70px;
         }
 
         .grid-3 td:nth-child(2), .grid-3 td:nth-child(3) {
-            width: 150px; /* Ширина столбцов с именем и фамилией */
+            width: 150px;
         }
 
         .grid-3 td:nth-child(4), .grid-3 td:nth-child(5) {
-            width: 150px; /* Ширина столбцов с логином и email */
+            width: 150px;
         }
 
         .grid-3 td:nth-child(6) {
-            width: 50px; /* Ширина столбца с админ статусом */
+            width: 50px;
         }
 
         .grid-3 td:nth-child(7), .grid-3 td:nth-child(8), .grid-3 td:nth-child(9) {
-            width: 150px; /* Ширина столбцов с датами */
+            width: 150px;
         }
 
         * {
@@ -90,7 +90,7 @@
         .grid-container {
             display: grid;
             grid-template-columns: repeat(3, 426px);
-            grid-template-rows: 238px 730px auto auto; /*  Добавляем auto для высоты третьей строки  */
+            grid-template-rows: 238px 730px auto auto;
             gap: 15px;
             justify-content: center;
             padding: 48px;
@@ -106,7 +106,6 @@
         .grid-2 {
             background-color: #1A1A28;
             grid-column: 1 / 4;
-            /* grid-row: 2 / 3;   Удаляем, так как теперь будет в третьей строке */
             border-radius: 20px;
             border-left: 1px dashed #8128BC;
         }
@@ -114,14 +113,13 @@
         .grid-3 {
             background-color: #1A1A28;
             grid-column: 1 / 4;
-            /* grid-row: 3; Указываем, что элемент должен начинаться с третьей строки */
             border-radius: 20px;
             border-left: 1px dashed #8128BC;
-            padding: 20px; /* Добавляем padding, чтобы контент не прилипал к краям */
+            padding: 20px;
             color: #fff;
         }
 
-        /* Стиль для нового grid-элемента с графиком */
+
         .grid-4 {
             background-color: #1A1A28;
             grid-column: 1 / 4;
@@ -129,7 +127,7 @@
             border-left: 1px dashed #8128BC;
             padding: 20px;
             color: #fff;
-            height: 300px; /*  Установите желаемую высоту */
+            height: 300px;
         }
 
         .grid-1, .grid-2, .grid-3, .grid-4 {
@@ -177,33 +175,37 @@
 
         .form__wrapper {
             font-size: 20px;
-            width: 389px; /* Ширина контейнера */
+            width: 389px;
         }
 
         .form__wrapper .field__category {
-            width: 100%; /* Ширина инпута */
-            height: 43px;
-            background: none;
-            border: 1px solid #fff;
-            border-radius: 20px;
-            color: #fff;
-            font-size: 16px;
-            padding: 0 20px;
-            font-family: "JetBrains Mono", monospace;
-            outline: none;
-        }
+    width: 100%;
+    height: 43px;
+    background: none;
+    border: 1px solid #fff;
+    border-radius: 20px;
+    color: #fff;
+    font-size: 16px;
+    padding: 0 20px;
+    font-family: "JetBrains Mono", monospace;
+    outline: none;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
 
-        .form__wrapper .field__category::placeholder {
-            color: #ccc;
-            font-size: 16px;
-            font-family: "JetBrains Mono", monospace;
-            font-weight: lighter;
-        }
+.form__wrapper .field__category::placeholder {
+    color: #ccc;
+    font-size: 16px;
+    font-family: "JetBrains Mono", monospace;
+    font-weight: lighter;
+}
 
-        .form__wrapper .field__category:focus {
-            border-color: #8128BC;
-            transition: 0.4s;
-        }
+.form__wrapper .field__category:focus {
+    border-color: #8128BC;
+    border: 2px solid #8128BC;
+    box-shadow: 0 0 0 0.2rem rgba(128, 40, 188, 0.25);
+    transition: 0.4s;
+}
+
 
         .radio__flex {
             display: grid;
@@ -404,13 +406,13 @@
 }
 
 #ban {
-    padding: 10px 20px; 
-    color: #fff; 
-    background-color: #ff0a0a; 
+    padding: 10px 20px;
+    color: #fff;
+    background-color: #ff0a0a;
     font-size: 16px;
     border: none;
-    border-radius: 5px; 
-    font-family: "JetBrains Mono", monospace; 
+    border-radius: 5px;
+    font-family: "JetBrains Mono", monospace;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
@@ -438,7 +440,61 @@
 
 
 
-        
+        .wrapperGetCategory {
+            display: none;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            padding: 20px;
+            background-color: #1A1A28;
+            border-radius: 20px;
+            border-left: 1px dashed #8128BC;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .category-card {
+            background-color: #2d2d3e;
+            border-radius: 10px;
+            padding: 15px;
+            color: #fff;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .tab {
+            cursor: pointer;
+            padding: 10px 20px;
+            background-color: #1A1A28;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            color: #fff;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .tab.active {
+            background-color: #8128BC;
+        }
+
+        .tab:hover {
+            background-color: #8128BC;
+        }
+
+        .text-center {
+            margin-bottom: 20px;
+            margin-top: 20px;
+        }
+
+
+
+
+
     </style>
 </head>
 <body>
@@ -500,9 +556,22 @@
                     </form>
                 </div>
             </div>
+
+
+                <!-- Табы для управления видимостью категорий -->
+                <div class="tab" onclick="toggleCategories()">Показать все категории</div>
+
+                <!-- Контейнер для категорий -->
+                <div class="wrapperGetCategory" id="categoriesContainer">
+                    @foreach($categories as $category)
+                        <div class="category-card">
+                            {{ $category->name }}
+                        </div>
+                    @endforeach
+
         </div>
-        
-       
+
+
 
 
         <div class="grid grid-3">
@@ -560,7 +629,7 @@
         </div>
 
         {{-- Добавляем новый grid-элемент для графика --}}
-      
+
         <div class="text-center"><h1>Графики</h1></div>
 
         <div class="grid grid-4">
@@ -582,8 +651,34 @@
             <span>Выйти</span>
         </button>
     </form>
+
+
+
+
+
+
+
+
     <script>
-        const dpr = window.devicePixelRatio || 1;
+
+
+            function toggleCategories() {
+            const categoriesContainer = document.getElementById('categoriesContainer');
+            const tab = document.querySelector('.tab');
+
+            if (categoriesContainer.style.display === 'none' || categoriesContainer.style.display === '') {
+                categoriesContainer.style.display = 'grid';
+                tab.classList.add('active');
+            } else {
+                categoriesContainer.style.display = 'none';
+                tab.classList.remove('active');
+            }
+        }
+
+
+
+
+const dpr = window.devicePixelRatio || 1;
 
 function adjustCanvas(canvas, width, height) {
     canvas.width = width * dpr;

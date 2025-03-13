@@ -76,6 +76,9 @@ public function showChat(Chat $chat)
     // Определяем собеседника
     $otherUser = $chat->user1_id === Auth::id() ? $chat->user2 : $chat->user1;
 
+    // Загружаем связанные данные для собеседника
+    $otherUser->load('userInfo');
+
     // Помечаем сообщения как прочитанные
     Message::where('chat_id', $chat->id)
            ->where('user_id', $otherUser->id) // Сообщения от собеседника
@@ -84,6 +87,7 @@ public function showChat(Chat $chat)
 
     return view('chats.show', compact('chat', 'messages', 'otherUser'));
 }
+
 
 
     public function sendMessage(Request $request, Chat $chat)

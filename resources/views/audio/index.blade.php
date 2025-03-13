@@ -6,10 +6,11 @@
 
         <!-- Кнопка загрузки аудио -->
         <a href="{{ route('audio.create') }}" class="">
-        <button class="add-music">
-            +
+        <button id="add-music" class="fixed bottom-20 right-8 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>            
         </button></a>
-
 
         <div class="mt-4 mb-6">
             <form action="{{ route('audio.index') }}" method="GET" class="flex items-center space-x-4">
@@ -79,11 +80,6 @@
 
                     <!-- Информация о треке -->
                     <div class="flex-1 ml-3">
-                         <!-- Canvas for particle animation -->
-                         <div class="flex-1 ml-3">
-                            <canvas id="particle-canvas-{{ $audio->id }}" class="absolute top-0 left-0 w-full h-full" style="pointer-events: none;"></canvas>
-                            <!-- Остальной контент -->
-                        </div>
                         <div class="flex items-center justify-between">
                             <div>
                                 <h2 class="text-sm font-semibold">{{ $audio->title }}</h2>
@@ -144,9 +140,19 @@
             </div>
         </div>
     </div>
+@endsection
 
 
-    <script>
+
+
+<style>
+.add-music {
+    
+}
+</style>
+
+
+<script>
     document.addEventListener('DOMContentLoaded', function() {
         const playButtons = document.querySelectorAll('.play-button');
         let currentAudioId = null;
@@ -164,11 +170,6 @@
         const prevButton = document.getElementById('prev-button');
         const nextButton = document.getElementById('next-button');
         let animationFrameId;
-
-        // Particle configuration
-        const particlesArray = [];
-        const numberOfParticles = 20;
-        const particleColor = 'rgba(113, 4, 255, 0.5)'; // Semi-transparent purple
 
         // Function to reset button icons
         function resetButtonIcons(audioId) {
@@ -203,161 +204,104 @@
             }
         };
 
-        // Particle class
-        class Particle {
-            constructor(canvas) {
-                this.canvas = canvas;
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = (Math.random() * 3) + 1;
-                this.speedX = (Math.random() * 2) - 1.5;
-                this.speedY = (Math.random() * 2) - 1.5;
-            }
-
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-
-                if (this.size > 0.1) this.size -= 0.05;
-                if (this.size < 0.1) {
-                    this.x = Math.random() * this.canvas.width;
-                    this.y = Math.random() * this.canvas.height;
-                    this.size = (Math.random() * 3) + 1;
-                    this.speedX = (Math.random() * 2) - 1;
-                    this.speedY = (Math.random() * 2) - 1;
-                }
-            }
-
-            draw() {
-                const ctx = this.canvas.getContext('2d');
-                ctx.fillStyle = particleColor;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.closePath();
-                ctx.fill();
-            }
-        }
-
-        // Initialize particles
-        function initParticles(canvas) {
-            particlesArray.length = 0;
-            for (let i = 0; i < numberOfParticles; i++) {
-                particlesArray.push(new Particle(canvas));
-            }
-        }
-
-        // Animate particles
-        function animateParticles(canvas) {
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particlesArray.forEach(particle => {
-                particle.update();
-                particle.draw();
-            });
-            animationFrameId = requestAnimationFrame(() => animateParticles(canvas));
-        }
-
         // Function to play audio
         function playAudio(audioId, button) {
-    const audioElement = document.getElementById(`audio-${audioId}`);
-    const playIcon = document.getElementById(`play-icon-${audioId}`);
-    const pauseIcon = document.getElementById(`pause-icon-${audioId}`);
-    const canvas = document.getElementById(`particle-canvas-${audioId}`);
+            const audioElement = document.getElementById(`audio-${audioId}`);
+            const playIcon = document.getElementById(`play-icon-${audioId}`);
+            const pauseIcon = document.getElementById(`pause-icon-${audioId}`);
 
-    // Проверка, существует ли canvas
-    if (!canvas) {
-        console.error(`Canvas with ID particle-canvas-${audioId} not found!`);
-        return;
-    }
+            // Остановить и сбросить, если играет другой трек
+            if (currentAudioId !== null && currentAudioId !== audioId) {
+                const currentAudioElement = document.getElementById(`audio-${currentAudioId}`);
+                currentAudioElement.pause();
+                resetButtonIcons(currentAudioId);
+                const currentPlayButton = document.querySelector(`[data-audio-id="${currentAudioId}"]`);
+                currentPlayButton.dataset.playing = 'false';
+            }
 
-    // Остановить и сбросить, если играет другой трек
-    if (currentAudioId !== null && currentAudioId !== audioId) {
-        const currentAudioElement = document.getElementById(`audio-${currentAudioId}`);
-        currentAudioElement.pause();
-        resetButtonIcons(currentAudioId);
-        cancelAnimationFrame(animationFrameId); // Отменить анимацию
-        const currentPlayButton = document.querySelector(`[data-audio-id="${currentAudioId}"]`);
-        currentPlayButton.dataset.playing = 'false';
-    }
+            // Воспроизвести новый трек
+            audioElement.play();
+            button.dataset.playing = 'true';
+            playIcon.classList.add('hidden');
+            pauseIcon.classList.remove('hidden');
+            globalPlayIcon.classList.add('hidden');
+            globalPauseIcon.classList.remove('hidden');
+            currentAudioId = audioId;
+            currentAudioElement = audioElement;
 
-    // Воспроизвести новый трек
-    audioElement.play();
-    button.dataset.playing = 'true';
-    playIcon.classList.add('hidden');
-    pauseIcon.classList.remove('hidden');
-    globalPlayIcon.classList.add('hidden');
-    globalPauseIcon.classList.remove('hidden');
-    currentAudioId = audioId;
-    currentAudioElement = audioElement;
+            // Обновить информацию о треке
+            const audioItem = button.closest('.audio-item');
+            const coverPath = audioItem.querySelector('img')?.getAttribute('src') || '';
+            const title = audioItem.querySelector('.text-sm.font-semibold').textContent;
+            const artist = audioItem.querySelector('.text-xs.text-gray-600').textContent;
 
-    // Обновить информацию о треке
-    const audioItem = button.closest('.audio-item');
-    const coverImg = audioItem.querySelector('.w-12 img');
-    const coverPath = coverImg ? coverImg.src : '';
-    const title = audioItem.querySelector('.text-sm').textContent;
-    const artist = audioItem.querySelector('.text-xs').textContent;
+            currentCover.setAttribute('src', coverPath);
+            currentTitle.textContent = title;
+            currentArtist.textContent = artist;
+            currentCoverContainer.classList.remove('hidden');
 
-    currentCover.src = coverPath;
-    currentTitle.textContent = title;
-    currentArtist.textContent = artist;
-    currentCoverContainer.classList.remove('hidden');
+            // Обновление прогресс-бара и времени
+            audioElement.addEventListener('timeupdate', updateProgressBar);
 
-    // Инициализация и анимация частиц
-    canvas.width = canvas.parentElement.offsetWidth; // Используем родительский элемент для ширины
-    canvas.height = canvas.parentElement.offsetHeight; // Используем родительский элемент для высоты
-    initParticles(canvas);
-    animateParticles(canvas);
-
-    // Установить длительность трека при загрузке
-    audioElement.addEventListener('loadedmetadata', () => {
-        const durationValue = Math.floor(audioElement.duration);
-        if (!isNaN(durationValue)) {
-            globalDuration.textContent = `${Math.floor(durationValue / 60)}:${String(durationValue % 60).padStart(2, '0')}`;
+            // Обработчик окончания воспроизведения
+            audioElement.addEventListener('ended', () => {
+                resetButtonIcons(audioId);
+                button.dataset.playing = 'false';
+                globalPlayIcon.classList.remove('hidden');
+                globalPauseIcon.classList.add('hidden');
+            });
         }
-    });
-}
 
-        // Handle play/pause button click
+        // Add event listeners to play buttons
         playButtons.forEach(button => {
-            const audioId = button.dataset.audioId;
-
             button.addEventListener('click', function() {
-                const isPlaying = button.dataset.playing === 'true';
-                const audioElement = document.getElementById(`audio-${audioId}`);
-                const playIcon = document.getElementById(`play-icon-${audioId}`);
-                const pauseIcon = document.getElementById(`pause-icon-${audioId}`);
-                const canvas = document.getElementById(`particle-canvas-${audioId}`);
+                const audioId = this.dataset.audioId;
+                const isPlaying = this.dataset.playing === 'true';
 
                 if (isPlaying) {
-                    // Pause audio
-                    audioElement.pause();
-                    button.dataset.playing = 'false';
-                    resetButtonIcons(audioId);
+                    // Pause the audio
+                    document.getElementById(`audio-${audioId}`).pause();
+                    this.dataset.playing = 'false';
+                    document.getElementById(`play-icon-${audioId}`).classList.remove('hidden');
+                    document.getElementById(`pause-icon-${audioId}`).classList.add('hidden');
                     globalPlayIcon.classList.remove('hidden');
                     globalPauseIcon.classList.add('hidden');
-                    cancelAnimationFrame(animationFrameId); // Stop animation
                 } else {
-                    // Play audio
-                    playAudio(audioId, button);
+                    // Play the audio
+                    playAudio(audioId, this);
                 }
             });
         });
 
-        // Update progress bar on time update
-        document.querySelectorAll('audio').forEach(audioElement => {
-            audioElement.addEventListener('timeupdate', updateProgressBar);
+        // Global play/pause button
+        globalPlayPauseButton.addEventListener('click', function() {
+            if (currentAudioElement) {
+                if (currentAudioElement.paused) {
+                    currentAudioElement.play();
+                    globalPlayIcon.classList.add('hidden');
+                    globalPauseIcon.classList.remove('hidden');
+                    document.getElementById(`play-icon-${currentAudioId}`).classList.add('hidden');
+                    document.getElementById(`pause-icon-${currentAudioId}`).classList.remove('hidden');
+                } else {
+                    currentAudioElement.pause();
+                    globalPlayIcon.classList.remove('hidden');
+                    globalPauseIcon.classList.add('hidden');
+                    document.getElementById(`play-icon-${currentAudioId}`).classList.remove('hidden');
+                    document.getElementById(`pause-icon-${currentAudioId}`).classList.add('hidden');
+                }
+            }
         });
 
-        // Seek audio on progress bar input
-        globalProgressBar.addEventListener('input', () => {
+        // Progress bar seek functionality
+        globalProgressBar.addEventListener('input', function() {
             if (currentAudioElement) {
-                const seekTime = (globalProgressBar.value / 100) * currentAudioElement.duration;
+                const seekTime = currentAudioElement.duration * (this.value / 100);
                 currentAudioElement.currentTime = seekTime;
                 updateProgressBar();
             }
         });
 
-        // Switch to previous track
+        // Previous button
         prevButton.addEventListener('click', () => {
             if (currentAudioId !== null) {
                 const currentIndex = Array.from(playButtons).findIndex(button => button.dataset.audioId === currentAudioId);
@@ -368,7 +312,7 @@
             }
         });
 
-        // Switch to next track
+  
         nextButton.addEventListener('click', () => {
             if (currentAudioId !== null) {
                 const currentIndex = Array.from(playButtons).findIndex(button => button.dataset.audioId === currentAudioId);
@@ -378,168 +322,5 @@
                 }
             }
         });
-
-        // Toggle play/pause on global button click
-        globalPlayPauseButton.addEventListener('click', function() {
-            if (currentAudioElement) {
-                if (currentAudioElement.paused) {
-                    currentAudioElement.play();
-                    globalPlayIcon.classList.add('hidden');
-                    globalPauseIcon.classList.remove('hidden');
-                    const canvas = document.getElementById(`particle-canvas-${currentAudioId}`);
-                    animateParticles(canvas);
-                } else {
-                    currentAudioElement.pause();
-                    globalPlayIcon.classList.remove('hidden');
-                    globalPauseIcon.classList.add('hidden');
-                    cancelAnimationFrame(animationFrameId);
-                }
-            }
-        });
     });
-
-    document.addEventListener('DOMContentLoaded', () => {
-    const durationElements = document.querySelectorAll('#duration');
-
-    function secondsToMinutesAndSeconds(seconds) {
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = seconds % 60;
-
-        const formattedMinutes = String(minutes).padStart(2, '0');
-        const formattedSeconds = String(remainingSeconds).padStart(2, '0');
-
-        return `${formattedMinutes}:${formattedSeconds}`;
-    }
-
-    durationElements.forEach(element => {
-        const duration = parseInt(element.textContent.replace(' сек.', ''));
-        const formattedDuration = secondsToMinutesAndSeconds(duration);
-        element.textContent = formattedDuration;
-    });
-});
-
-
-
-
 </script>
-
-<style>
-    input[type="range"] {
-           -webkit-appearance: none;
-           appearance: none;
-           background: #e2e8f0; /* Цвет фона */
-           height: 4px;
-           border-radius: 2px;
-           outline: none;
-       }
-
-       input[type="range"]::-webkit-slider-thumb {
-           -webkit-appearance: none;
-           appearance: none;
-           width: 12px;
-           height: 12px;
-           background: #000000; /* Цвет ползунка */
-           border-radius: 10%;
-           cursor: pointer;
-       }
-
-       input[type="range"]::-moz-range-thumb {
-           width: 12px;
-           height: 12px;
-           background: #3b82f6;
-           border-radius: 50%;
-           cursor: pointer;
-       }
-
-       .audio-container {
-           position: relative;
-           overflow: hidden;
-       }
-
-       .add-music {
-    position: fixed;
-    bottom: 100px;
-    right: 20px;
-    width: 40px;
-    height: 40px;
-    background-color: #3b82f6; 
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    border: none;
-    outline: none;
-    color: #fff;
-}
-
-.add-music a {
-    color: white;
-    font-size: 18px;
-    text-decoration: none;
-}
-
-.add-music:hover {
-    background-color: #000000; /* Цвет при наведении */
-    color: #fff;
-}
-/* Стили для выпадающих списков */
-select {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background-color: white;
-    border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
-    padding: 0.5rem 2rem 0.5rem 1rem;
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-    color: #374151;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-}
-
-select:hover {
-    border-color: #9ca3af;
-}
-
-select:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
-}
-
-/* Иконка стрелки */
-.relative svg {
-    transition: transform 0.2s ease-in-out;
-}
-
-select:focus + .relative svg {
-    transform: rotate(180deg);
-}
-
-/* Кнопка сортировки */
-.relative #sort {
-    background-color: #3b82f6;
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    transition: all 0.2s ease-in-out;
-}
-
-.relative #sort:hover {
-    background-color: #2563eb;
-    transform: scale(1.05);
-}
-
-.relative #sort:active {
-    transform: scale(0.95);
-}
-
-#sort:focus {
-    border: 1px solid #2563eb;
-}
-</style>
-@endsection

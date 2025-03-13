@@ -3,25 +3,43 @@
 namespace App\Traits;
 
 use Carbon\Carbon;
+use App\Events\UserStatusUpdated;
+use Illuminate\Support\Facades\Cache;
 
 trait UserActivityStatus
 {
     /**
-     * Обновляет время последней активности пользователя.
+     * Ключ для хранения статуса онлайн в кеше.
+     */
+    protected function getCacheKey(): string
+    {
+        return 'user-online-' . $this->id;
+    }
+
+    /**
+     * Обновляет время последней активности пользователя и устанавливает статус онлайн в кеше.
      */
     public function updateLastActivity()
     {
         $this->last_activity_at = now();
-        $this->is_online = true;
         $this->save();
+
+        Cache::put($this->getCacheKey(), true, now()->addMinutes(5));
+
+        broadcast(new UserStatusUpdated($this))->toOthers();
     }
 
     /**
-     * Проверяет, онлайн ли пользователь.
+     * Проверяет, онлайн ли пользователь, используя кеш и базу данных.
      */
-    public function isOnline()
+    public function isOnline(): bool
     {
-        return $this->is_online && $this->last_activity_at > now()->subMinutes(5);
+        if (Cache::has($this->getCacheKey())) {
+            return true; // Пользователь онлайн (есть запись в кеше)
+        }
+
+        // Если нет в кеше, проверяем last_activity_at в базе данных (альтернативный вариант)
+        return $this->last_activity_at !== null && $this->last_activity_at > now()->subMinutes(5);
     }
 
     /**
@@ -29,6 +47,10 @@ trait UserActivityStatus
      */
     public function lastSeen()
     {
+
+
+        Carbon::setLocale('ru');
+
         if ($this->isOnline()) {
             return 'Онлайн';
         }
@@ -39,6 +61,8 @@ trait UserActivityStatus
 
         $now = now();
         $lastSeen = Carbon::parse($this->last_activity_at);
+
+        $lastSeen->setTimeZone('Europe/Moscow');
 
         // Разница в минутах
         $diffInMinutes = $now->diffInMinutes($lastSeen);
@@ -150,10 +174,11 @@ trait UserActivityStatus
     }
 
     /**
-     * Обновляет статус пользователя как оффлайн.
+     * Обновляет статус пользователя как оффлайн (удаляет из кеша).
      */
     public function markAsOffline()
     {
+        Cache::forget($this->getCacheKey());
         $this->is_online = false;
         $this->save();
     }

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class NewsController extends Controller
 {
-    
+
     public function getLazy()
     {
         $news = News::latest()->get()->map(function ($item) {
@@ -23,13 +23,13 @@ class NewsController extends Controller
 
     public function index()
     {
-        $news = News::orderBy('created_at', 'desc')->get(); 
+        $news = News::orderBy('created_at', 'desc')->get();
         return view('news.index', compact('news'));
     }
 
     public function create()
     {
-        return view('news.upload'); 
+        return view('news.upload');
     }
 
     public function store(Request $request)
@@ -51,7 +51,7 @@ class NewsController extends Controller
             // Сохранение файла в папку storage/app/public/media
             $path = $file->store('public/media');
             // Убираем "public/" из пути для хранения в БД
-            $mediaPath = str_replace('public/', '', $path); 
+            $mediaPath = str_replace('public/', '', $path);
         } else {
             return back()->withErrors(['media' => 'Ошибка при загрузке файла.'])->withInput();
         }

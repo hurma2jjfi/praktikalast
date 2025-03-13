@@ -68,7 +68,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
     Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
     Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
-    
+
     //Удаление и редактирование поста
     Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
     Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
@@ -91,7 +91,7 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/posts/{post}/like', [LikeController::class, 'toggleLike'])->name('posts.like');
 
-    
+
     Route::get('/chats', [ChatController::class, 'index'])->name('chats.index');
     Route::get('/chats/{chat}', [ChatController::class, 'show'])->name('chats.show');
     Route::post('/chats/{chat}/messages', [ChatController::class, 'sendMessage'])->name('chats.messages.store');
